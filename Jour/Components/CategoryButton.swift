@@ -7,17 +7,30 @@
 
 import SwiftUI
 
+/// Reusable button component for selecting journal entry categories
+/// Displays category emoji and name with visual feedback for selection state
 struct CategoryButton: View {
+    // MARK: - Properties
+    
+    /// The journal category this button represents
     let category: JournalCategory
+    
+    /// Whether this category is currently selected
     let isSelected: Bool
+    
+    /// Action to perform when the button is tapped
     let action: () -> Void
+    
+    // MARK: - Body
     
     var body: some View {
         Button(action: action) {
             VStack(spacing: 8) {
+                // Category emoji
                 Text(category.emoji)
                     .font(.title)
                 
+                // Category name
                 Text(category.rawValue)
                     .font(.caption)
                     .fontWeight(.medium)

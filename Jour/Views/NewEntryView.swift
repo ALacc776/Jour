@@ -7,24 +7,60 @@
 
 import SwiftUI
 
+/// Modal view for creating new journal entries
+/// Supports both categorized and free-form entry modes with optional time and date selection
 struct NewEntryView: View {
+    // MARK: - Properties
+    
+    /// Reference to the journal manager for saving entries
     @ObservedObject var journalManager: JournalManager
+    
+    /// Environment value for dismissing the modal
     @Environment(\.dismiss) private var dismiss
+    
+    /// The main text content of the journal entry
     @State private var entryText = ""
+    
+    /// Selected category for categorized entries
     @State private var selectedCategory: JournalCategory?
+    
+    /// Optional time string for the entry
     @State private var selectedTime = ""
+    
+    /// Whether the entry is in free-form mode (no category)
     @State private var isFreeForm = false
+    
+    /// Optional specific date for the entry (if not provided, uses current date)
     @State private var selectedDate: Date?
     
+    // MARK: - Constants
+    
+    /// Number of columns in the category selection grid
+    private let categoryGridColumns = 2
+    
+    /// Vertical spacing between grid items
+    private let categoryGridSpacing: CGFloat = 12
+    
+    /// Vertical padding for category buttons
+    private let categoryButtonPadding: CGFloat = 12
+    
+    // MARK: - Initialization
+    
+    /// Creates a new entry view with optional pre-selected date
+    /// - Parameters:
+    ///   - journalManager: The journal manager instance
+    ///   - selectedDate: Optional date to pre-fill for the entry
     init(journalManager: JournalManager, selectedDate: Date? = nil) {
         self.journalManager = journalManager
         self.selectedDate = selectedDate
     }
     
+    // MARK: - Body
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                // Entry mode selection
+                // MARK: - Entry Mode Selection
                 Picker("Entry Mode", selection: $isFreeForm) {
                     Text("Category").tag(false)
                     Text("Free Form").tag(true)
@@ -33,8 +69,11 @@ struct NewEntryView: View {
                 .padding(.horizontal)
                 
                 if !isFreeForm {
-                    // Category selection
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
+                    // MARK: - Category Selection Grid
+                    LazyVGrid(
+                        columns: Array(repeating: GridItem(.flexible()), count: categoryGridColumns),
+                        spacing: categoryGridSpacing
+                    ) {
                         ForEach(JournalCategory.allCases, id: \.self) { category in
                             CategoryButton(
                                 category: category,
@@ -47,7 +86,7 @@ struct NewEntryView: View {
                     .padding(.horizontal)
                 }
                 
-                // Time input
+                // MARK: - Time Input
                 HStack {
                     Text("Time (optional):")
                         .font(.headline)
@@ -58,7 +97,7 @@ struct NewEntryView: View {
                 }
                 .padding(.horizontal)
                 
-                // Content input
+                // MARK: - Content Input
                 VStack(alignment: .leading, spacing: 8) {
                     Text("What happened?")
                         .font(.headline)
@@ -95,6 +134,10 @@ struct NewEntryView: View {
         }
     }
     
+    // MARK: - Private Methods
+    
+    /// Saves the current journal entry with all user input
+    /// Validates content, creates a JournalEntry object, and saves it through the journal manager
     private func saveEntry() {
         let content = entryText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !content.isEmpty else { return }

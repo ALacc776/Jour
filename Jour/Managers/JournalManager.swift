@@ -8,20 +8,46 @@
 import Foundation
 import SwiftUI
 
+/// Manages all journal entries and streak data for the app
+/// This class handles data persistence, streak calculations, and provides methods for CRUD operations
 class JournalManager: ObservableObject {
+    // MARK: - Published Properties
+    
+    /// Array of all journal entries, sorted by date (newest first)
     @Published var entries: [JournalEntry] = []
+    
+    /// Current streak information including current and longest streaks
     @Published var streak: JournalStreak = JournalStreak()
     
+    // MARK: - Private Properties
+    
+    /// UserDefaults instance for data persistence
     private let userDefaults = UserDefaults.standard
+    
+    // MARK: - Constants
+    
+    /// Key for storing journal entries in UserDefaults
     private let entriesKey = "journal_entries"
+    
+    /// Key for storing streak data in UserDefaults
     private let streakKey = "journal_streak"
     
+    /// Date format used for storing dates as strings
+    private let dateFormat = "yyyy-MM-dd"
+    
+    // MARK: - Initialization
+    
+    /// Initializes the JournalManager and loads existing data
     init() {
         loadEntries()
         loadStreak()
         updateStreak()
     }
     
+    // MARK: - Public Methods
+    
+    /// Saves a new journal entry and updates the streak
+    /// - Parameter entry: The journal entry to save
     func saveEntry(_ entry: JournalEntry) {
         entries.append(entry)
         entries.sort { $0.date > $1.date } // Sort by date, newest first
@@ -29,17 +55,26 @@ class JournalManager: ObservableObject {
         updateStreak()
     }
     
+    /// Deletes a journal entry and updates the streak
+    /// - Parameter entry: The journal entry to delete
     func deleteEntry(_ entry: JournalEntry) {
         entries.removeAll { $0.id == entry.id }
         saveEntries()
         updateStreak()
     }
     
+    /// Returns all journal entries for a specific date
+    /// - Parameter date: The date to filter entries by
+    /// - Returns: Array of journal entries for the specified date
     func getEntriesForDate(_ date: Date) -> [JournalEntry] {
         let calendar = Calendar.current
         return entries.filter { calendar.isDate($0.date, inSameDayAs: date) }
     }
     
+    // MARK: - Private Methods
+    
+    /// Updates the current streak based on journal entries
+    /// Calculates consecutive days of journaling and updates both current and longest streaks
     private func updateStreak() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -48,6 +83,7 @@ class JournalManager: ObservableObject {
         let entryDates = Set(entries.map { calendar.startOfDay(for: $0.date) })
             .sorted()
         
+        // If no entries exist, reset streak
         guard !entryDates.isEmpty else {
             streak.current = 0
             saveStreak()
@@ -83,35 +119,60 @@ class JournalManager: ObservableObject {
         saveStreak()
     }
     
+    /// Formats a date to a string for storage
+    /// - Parameter date: The date to format
+    /// - Returns: Formatted date string in "yyyy-MM-dd" format
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.dateFormat = dateFormat
         return formatter.string(from: date)
     }
     
+    /// Saves journal entries to UserDefaults
+    /// Encodes the entries array to JSON and stores it persistently
     private func saveEntries() {
-        if let encoded = try? JSONEncoder().encode(entries) {
+        do {
+            let encoded = try JSONEncoder().encode(entries)
             userDefaults.set(encoded, forKey: entriesKey)
+        } catch {
+            print("Failed to save journal entries: \(error.localizedDescription)")
         }
     }
     
+    /// Loads journal entries from UserDefaults
+    /// Decodes the stored JSON data back into the entries array
     private func loadEntries() {
-        if let data = userDefaults.data(forKey: entriesKey),
-           let decoded = try? JSONDecoder().decode([JournalEntry].self, from: data) {
+        guard let data = userDefaults.data(forKey: entriesKey) else { return }
+        
+        do {
+            let decoded = try JSONDecoder().decode([JournalEntry].self, from: data)
             entries = decoded
+        } catch {
+            print("Failed to load journal entries: \(error.localizedDescription)")
         }
     }
     
+    /// Saves streak data to UserDefaults
+    /// Encodes the streak object to JSON and stores it persistently
     private func saveStreak() {
-        if let encoded = try? JSONEncoder().encode(streak) {
+        do {
+            let encoded = try JSONEncoder().encode(streak)
             userDefaults.set(encoded, forKey: streakKey)
+        } catch {
+            print("Failed to save streak data: \(error.localizedDescription)")
         }
     }
     
+    /// Loads streak data from UserDefaults
+    /// Decodes the stored JSON data back into the streak object
     private func loadStreak() {
-        if let data = userDefaults.data(forKey: streakKey),
-           let decoded = try? JSONDecoder().decode(JournalStreak.self, from: data) {
+        guard let data = userDefaults.data(forKey: streakKey) else { return }
+        
+        do {
+            let decoded = try JSONDecoder().decode(JournalStreak.self, from: data)
             streak = decoded
+        } catch {
+            print("Failed to load streak data: \(error.localizedDescription)")
         }
     }
 }
