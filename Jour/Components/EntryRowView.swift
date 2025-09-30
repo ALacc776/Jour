@@ -18,40 +18,50 @@ struct EntryRowView: View {
     // MARK: - Body
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // MARK: - Category and Time Header
+        VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
+            // MARK: - Category Badge (if available)
             if let category = entry.category {
                 HStack {
-                    // Category emoji
-                    Text(JournalCategory(rawValue: category)?.emoji ?? "📝")
-                        .font(.title2)
-                    
-                    // Category name
                     Text(category)
-                        .font(.headline)
-                        .foregroundColor(.primary)
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(
+                            Capsule()
+                                .fill(Color.blue.opacity(0.2))
+                        )
+                        .foregroundColor(.blue)
                     
                     Spacer()
-                    
-                    // Optional time display
-                    if let time = entry.time {
-                        Text(time)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
                 }
             }
             
             // MARK: - Entry Content
             Text(entry.content)
                 .font(.body)
+                .primaryTextStyle()
                 .lineLimit(nil)
+                .frame(maxWidth: .infinity, alignment: .leading)
             
-            // MARK: - Creation Time
-            Text(entry.date, style: .time)
-                .font(.caption)
-                .foregroundColor(.secondary)
+            // MARK: - Time Display
+            HStack {
+                if let time = entry.time {
+                    Text(time)
+                        .font(.caption)
+                        .tertiaryTextStyle()
+                }
+                
+                Spacer()
+                
+                Text(entry.date, style: .time)
+                    .font(.caption)
+                    .tertiaryTextStyle()
+            }
         }
-        .padding(.vertical, 4)
+        .journalCardStyle()
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(entry.category ?? "Entry"): \(entry.content)")
+        .accessibilityHint("Created at \(entry.date, style: .time)")
     }
 }

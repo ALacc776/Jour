@@ -18,51 +18,74 @@ struct StreakDisplay: View {
     // MARK: - Body
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: AppConstants.Spacing.md) {
             // MARK: - Streak Information Card
             HStack {
                 // Flame icon for visual appeal
                 Image(systemName: "flame.fill")
-                    .foregroundColor(.orange)
+                    .primaryTextStyle()
                     .font(.title2)
+                    .scaleEffect(streak.current > 0 ? 1.1 : 1.0)
+                    .animation(.spring(response: 0.5, dampingFraction: 0.6), value: streak.current)
                 
                 // Current streak display
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("\(streak.current)")
-                        .font(.title)
+                VStack(alignment: .leading, spacing: AppConstants.Spacing.xs) {
+                    Text("\(streak.current) Days")
+                        .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(.primary)
+                        .primaryTextStyle()
+                        .contentTransition(.numericText())
                     
-                    Text("Day Streak")
+                    Text("Current Streak")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .secondaryTextStyle()
                 }
                 
                 Spacer()
                 
                 // Personal best display
-                VStack(alignment: .trailing, spacing: 2) {
+                VStack(alignment: .trailing, spacing: AppConstants.Spacing.xs) {
                     Text("Best: \(streak.longest)")
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .primaryTextStyle()
+                        .contentTransition(.numericText())
                     
                     Text("Personal Best")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .secondaryTextStyle()
                 }
             }
-            .padding()
+            .padding(AppConstants.Spacing.xl)
             .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
+                LinearGradient(
+                    gradient: Gradient(colors: AppConstants.Colors.streakGradient),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
             )
+            .cornerRadius(AppConstants.CornerRadius.lg)
+            .shadow(
+                color: AppConstants.Shadows.streak.color,
+                radius: AppConstants.Shadows.streak.radius,
+                x: AppConstants.Shadows.streak.x,
+                y: AppConstants.Shadows.streak.y
+            )
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Current streak: \(streak.current) days. Personal best: \(streak.longest) days")
             
             // MARK: - Encouraging Message
             if streak.current > 0 {
                 Text(encouragingMessage)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .tertiaryTextStyle()
                     .multilineTextAlignment(.center)
+                    .horizontalPadding()
+            } else {
+                Text("Keep your streak alive - log today!")
+                    .font(.caption)
+                    .tertiaryTextStyle()
+                    .multilineTextAlignment(.center)
+                    .horizontalPadding()
             }
         }
     }

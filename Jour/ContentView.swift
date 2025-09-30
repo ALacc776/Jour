@@ -23,18 +23,52 @@ struct ContentView: View {
     var body: some View {
         TabView {
             // MARK: - Timeline Tab
-            VStack {
-                // Display current streak information
-                StreakDisplay(streak: journalManager.streak)
-                    .padding()
-                
-                // Button to create a new journal entry
-                Button("Log Day") {
-                    showingNewEntry = true
+            VStack(spacing: 0) {
+                // Header with app title and main action
+                VStack(spacing: 16) {
+                    // App Title
+                    VStack(spacing: AppConstants.Spacing.xs) {
+                        Text(AppConstants.appName)
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .primaryTextStyle()
+                        
+                        Text(AppConstants.appTagline)
+                            .font(.subheadline)
+                            .secondaryTextStyle()
+                    }
+                    .padding(.top, AppConstants.Spacing.xl)
+                    
+                    // Main Log Day Button
+                    Button(action: {
+                        // Add haptic feedback
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                        impactFeedback.impactOccurred()
+                        showingNewEntry = true
+                    }) {
+                        HStack(spacing: AppConstants.Spacing.sm) {
+                            Image(systemName: "plus")
+                                .font(.headline)
+                            Text("Log Day")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .primaryTextStyle()
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, AppConstants.Spacing.lg)
+                        .buttonGradientStyle()
+                    }
+                    .accessibilityLabel(AppConstants.Accessibility.logDayButton)
+                    .horizontalPadding()
+                    .scaleEffect(showingNewEntry ? 0.95 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.8), value: showingNewEntry)
+                    
+                    // Streak Display
+                    StreakDisplay(streak: journalManager.streak)
+                        .horizontalPadding()
                 }
-                .buttonStyle(.borderedProminent)
-                .font(.headline)
-                .padding(.bottom)
+                .padding(.bottom, AppConstants.Spacing.xl)
+                .primaryGradientBackground()
                 
                 // Timeline showing all journal entries
                 TimelineView(journalManager: journalManager)
@@ -51,6 +85,7 @@ struct ContentView: View {
                     Text("Calendar")
                 }
         }
+        .preferredColorScheme(.dark)
         .sheet(isPresented: $showingNewEntry) {
             NewEntryView(journalManager: journalManager)
         }

@@ -27,13 +27,10 @@ class JournalManager: ObservableObject {
     // MARK: - Constants
     
     /// Key for storing journal entries in UserDefaults
-    private let entriesKey = "journal_entries"
+    private let entriesKey = AppConstants.UserDefaultsKeys.journalEntries
     
     /// Key for storing streak data in UserDefaults
-    private let streakKey = "journal_streak"
-    
-    /// Date format used for storing dates as strings
-    private let dateFormat = "yyyy-MM-dd"
+    private let streakKey = AppConstants.UserDefaultsKeys.journalStreak
     
     // MARK: - Initialization
     
@@ -53,6 +50,10 @@ class JournalManager: ObservableObject {
         entries.sort { $0.date > $1.date } // Sort by date, newest first
         saveEntries()
         updateStreak()
+        
+        // Add haptic feedback for successful save
+        let successFeedback = UINotificationFeedbackGenerator()
+        successFeedback.notificationOccurred(.success)
     }
     
     /// Deletes a journal entry and updates the streak
@@ -61,6 +62,10 @@ class JournalManager: ObservableObject {
         entries.removeAll { $0.id == entry.id }
         saveEntries()
         updateStreak()
+        
+        // Add haptic feedback for deletion
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
     }
     
     /// Returns all journal entries for a specific date
@@ -79,9 +84,8 @@ class JournalManager: ObservableObject {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         
-        // Get all unique dates with entries, sorted by date
+        // Get all unique dates with entries, sorted by date (optimized)
         let entryDates = Set(entries.map { calendar.startOfDay(for: $0.date) })
-            .sorted()
         
         // If no entries exist, reset streak
         guard !entryDates.isEmpty else {
@@ -96,7 +100,7 @@ class JournalManager: ObservableObject {
         let hasEntryYesterday = entryDates.contains(yesterday)
         
         if hasEntryToday {
-            // Calculate current streak from today backwards
+            // Calculate current streak from today backwards (optimized)
             var currentStreak = 0
             var checkDate = today
             
@@ -123,9 +127,7 @@ class JournalManager: ObservableObject {
     /// - Parameter date: The date to format
     /// - Returns: Formatted date string in "yyyy-MM-dd" format
     private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = dateFormat
-        return formatter.string(from: date)
+        date.storageFormat
     }
     
     /// Saves journal entries to UserDefaults

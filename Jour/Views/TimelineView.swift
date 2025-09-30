@@ -19,38 +19,100 @@ struct TimelineView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
+            VStack(spacing: 0) {
                 if journalManager.entries.isEmpty {
                     // MARK: - Empty State
-                    VStack(spacing: 20) {
+                    VStack(spacing: 24) {
                         Image(systemName: "book.closed")
-                            .font(.system(size: 60))
-                            .foregroundColor(.gray)
+                            .font(.system(size: 80))
+                            .foregroundColor(.white.opacity(0.6))
                         
-                        Text("Your Journal is Empty")
-                            .font(.title2)
-                            .foregroundColor(.gray)
-                        
-                        Text("Start writing your first entry")
-                            .font(.body)
-                            .foregroundColor(.secondary)
+                        VStack(spacing: 8) {
+                            Text("Your Journal is Empty")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                            
+                            Text("Start writing your first entry")
+                                .font(.body)
+                                .foregroundColor(.white.opacity(0.7))
+                        }
                     }
-                    .padding()
+                    .padding(40)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.indigo.opacity(0.1),
+                                Color.purple.opacity(0.05)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                 } else {
                     // MARK: - Timeline of Entries
-                    List {
-                        ForEach(groupedEntries, id: \.0) { date, entries in
-                            Section(header: Text(formatDate(date)).font(.headline)) {
-                                ForEach(entries) { entry in
-                                    EntryRowView(entry: entry)
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(groupedEntries, id: \.0) { date, entries in
+                                VStack(alignment: .leading, spacing: 12) {
+                                    // Date Header
+                                    HStack {
+                                        Image(systemName: "clock")
+                                            .foregroundColor(.white.opacity(0.7))
+                                            .font(.caption)
+                                        
+                                        Text(formatDate(date))
+                                            .font(.headline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.white)
+                                        
+                                        Spacer()
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.top, 8)
+                                    
+                                    // Entries for this date
+                                    VStack(spacing: 8) {
+                                        ForEach(entries) { entry in
+                                            EntryRowView(entry: entry)
+                                                .swipeActions(edge: .trailing) {
+                                                    Button("Delete", role: .destructive) {
+                                                        withAnimation(.spring()) {
+                                                            journalManager.deleteEntry(entry)
+                                                        }
+                                                    }
+                                                }
+                                        }
+                                    }
+                                    .padding(.horizontal, 20)
                                 }
                             }
                         }
+                        .padding(.vertical, 20)
                     }
+                    .refreshable {
+                        // Add haptic feedback for refresh
+                        let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+                        impactFeedback.impactOccurred()
+                        
+                        // Simulate refresh delay for better UX
+                        try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                    }
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.indigo.opacity(0.1),
+                                Color.purple.opacity(0.05)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
                 }
             }
             .navigationTitle("Timeline")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
     
