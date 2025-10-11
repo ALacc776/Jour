@@ -24,6 +24,9 @@ class JournalManager: ObservableObject {
     /// UserDefaults instance for data persistence
     private let userDefaults = UserDefaults.standard
     
+    /// Privacy manager for encryption and privacy controls
+    private let privacyManager = PrivacyManager()
+    
     // MARK: - Constants
     
     /// Key for storing journal entries in UserDefaults
@@ -130,27 +133,51 @@ class JournalManager: ObservableObject {
         date.storageFormat
     }
     
-    /// Saves journal entries to UserDefaults
+    /// Saves journal entries to UserDefaults with encryption
     /// Encodes the entries array to JSON and stores it persistently
     private func saveEntries() {
         do {
-            let encoded = try JSONEncoder().encode(entries)
-            userDefaults.set(encoded, forKey: entriesKey)
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            let encoded = try encoder.encode(entries)
+            
+            // Encrypt the data if privacy manager is enabled
+            if let encryptedData = privacyManager.encryptText(String(data: encoded, encoding: .utf8) ?? "") {
+                userDefaults.set(encryptedData, forKey: entriesKey)
+            } else {
+                // Fallback to unencrypted storage
+                userDefaults.set(encoded, forKey: entriesKey)
+            }
         } catch {
             print("Failed to save journal entries: \(error.localizedDescription)")
         }
     }
     
-    /// Loads journal entries from UserDefaults
+    /// Loads journal entries from UserDefaults with decryption
     /// Decodes the stored JSON data back into the entries array
     private func loadEntries() {
         guard let data = userDefaults.data(forKey: entriesKey) else { return }
         
         do {
-            let decoded = try JSONDecoder().decode([JournalEntry].self, from: data)
+            var jsonData: Data
+            
+            // Try to decrypt first
+            if let decryptedText = privacyManager.decryptText(data),
+               let decryptedData = decryptedText.data(using: .utf8) {
+                jsonData = decryptedData
+            } else {
+                // Fallback to unencrypted data
+                jsonData = data
+            }
+            
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let decoded = try decoder.decode([JournalEntry].self, from: jsonData)
             entries = decoded
         } catch {
             print("Failed to load journal entries: \(error.localizedDescription)")
+            // If loading fails, start with empty array
+            entries = []
         }
     }
     

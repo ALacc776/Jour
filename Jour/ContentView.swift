@@ -15,6 +15,9 @@ struct ContentView: View {
     /// Manages all journal data and business logic
     @StateObject private var journalManager = JournalManager()
     
+    /// Manages privacy and encryption settings
+    @StateObject private var privacyManager = PrivacyManager()
+    
     /// Controls the presentation of the new entry sheet
     @State private var showingNewEntry = false
     
@@ -84,6 +87,13 @@ struct ContentView: View {
                 .tabItem {
                     Image(systemName: "calendar")
                     Text("Calendar")
+                }
+            
+            // MARK: - Settings Tab
+            SettingsView(journalManager: journalManager, privacyManager: privacyManager)
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("Settings")
                 }
         }
         .preferredColorScheme(.light)

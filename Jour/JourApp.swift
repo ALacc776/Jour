@@ -17,6 +17,12 @@ struct JourApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .errorHandling()
+                .performanceMonitoring()
+                .onAppear {
+                    // Record app launch completion
+                    PerformanceMonitor.shared.recordLaunchCompletion()
+                }
         }
     }
 }
