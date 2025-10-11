@@ -163,7 +163,7 @@ class PrivacyManager: ObservableObject {
     }
     
     /// Saves privacy preferences to UserDefaults
-    private func savePrivacyPreferences() {
+    func savePrivacyPreferences() {
         userDefaults.set(hasUserConsent, forKey: UserDefaultsKeys.hasUserConsent)
         userDefaults.set(hasAcceptedPrivacyPolicy, forKey: UserDefaultsKeys.hasAcceptedPrivacyPolicy)
         userDefaults.set(isEncryptionEnabled, forKey: UserDefaultsKeys.isEncryptionEnabled)

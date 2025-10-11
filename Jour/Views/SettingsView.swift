@@ -248,8 +248,10 @@ struct SettingsView: View {
     /// Deletes all journal data
     private func deleteAllData() {
         journalManager.entries.removeAll()
-        journalManager.saveEntries()
-        journalManager.updateStreak()
+        // Trigger save by adding and removing an entry
+        let tempEntry = JournalEntry(content: "temp")
+        journalManager.saveEntry(tempEntry)
+        journalManager.deleteEntry(tempEntry)
         
         // Reset privacy preferences
         privacyManager.resetPrivacyPreferences()

@@ -95,7 +95,7 @@ struct DataExportView: View {
                     
                     // Export Button
                     Button(action: {
-                        exportData()
+                        performExport()
                     }) {
                         HStack {
                             Image(systemName: "square.and.arrow.up")
@@ -240,7 +240,7 @@ struct DataExportView: View {
     // MARK: - Private Methods
     
     /// Exports journal data in the selected format
-    private func exportData() {
+    private func performExport() {
         let timestamp = DateFormatter().string(from: Date())
         exportFileName = "QuickJournal_Export_\(timestamp).\(selectedExportFormat.fileExtension)"
         

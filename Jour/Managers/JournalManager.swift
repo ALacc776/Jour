@@ -83,7 +83,7 @@ class JournalManager: ObservableObject {
     
     /// Updates the current streak based on journal entries
     /// Calculates consecutive days of journaling and updates both current and longest streaks
-    private func updateStreak() {
+    func updateStreak() {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
         
@@ -135,7 +135,7 @@ class JournalManager: ObservableObject {
     
     /// Saves journal entries to UserDefaults with encryption
     /// Encodes the entries array to JSON and stores it persistently
-    private func saveEntries() {
+    func saveEntries() {
         do {
             let encoder = JSONEncoder()
             encoder.dateEncodingStrategy = .iso8601
