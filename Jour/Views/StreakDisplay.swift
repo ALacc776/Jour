@@ -18,27 +18,28 @@ struct StreakDisplay: View {
     // MARK: - Body
     
     var body: some View {
-        VStack(spacing: AppConstants.Spacing.md) {
+        VStack(spacing: AppConstants.Spacing.lg) {
             // MARK: - Streak Information Card
-            HStack {
+            HStack(spacing: AppConstants.Spacing.xl) {
                 // Flame icon for visual appeal
                 Image(systemName: "flame.fill")
-                    .primaryTextStyle()
+                    .foregroundColor(AppConstants.Colors.accentButton)
                     .font(.title2)
                     .scaleEffect(streak.current > 0 ? 1.1 : 1.0)
                     .animation(.spring(response: 0.5, dampingFraction: 0.6), value: streak.current)
                 
                 // Current streak display
                 VStack(alignment: .leading, spacing: AppConstants.Spacing.xs) {
-                    Text("\(streak.current) Days")
-                        .font(.title2)
+                    Text("\(streak.current)")
+                        .font(.largeTitle)
                         .fontWeight(.bold)
-                        .primaryTextStyle()
+                        .foregroundColor(AppConstants.Colors.primaryText)
                         .contentTransition(.numericText())
                     
                     Text("Current Streak")
                         .font(.caption)
-                        .secondaryTextStyle()
+                        .fontWeight(.medium)
+                        .foregroundColor(AppConstants.Colors.secondaryText)
                 }
                 
                 Spacer()
@@ -47,43 +48,34 @@ struct StreakDisplay: View {
                 VStack(alignment: .trailing, spacing: AppConstants.Spacing.xs) {
                     Text("Best: \(streak.longest)")
                         .font(.headline)
-                        .primaryTextStyle()
+                        .fontWeight(.semibold)
+                        .foregroundColor(AppConstants.Colors.primaryText)
                         .contentTransition(.numericText())
                     
                     Text("Personal Best")
                         .font(.caption)
-                        .secondaryTextStyle()
+                        .fontWeight(.medium)
+                        .foregroundColor(AppConstants.Colors.secondaryText)
                 }
             }
             .padding(AppConstants.Spacing.xl)
-            .background(
-                LinearGradient(
-                    gradient: Gradient(colors: AppConstants.Colors.streakGradient),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .cornerRadius(AppConstants.CornerRadius.lg)
-            .shadow(
-                color: AppConstants.Shadows.streak.color,
-                radius: AppConstants.Shadows.streak.radius,
-                x: AppConstants.Shadows.streak.x,
-                y: AppConstants.Shadows.streak.y
-            )
+            .elevatedCardStyle()
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Current streak: \(streak.current) days. Personal best: \(streak.longest) days")
             
             // MARK: - Encouraging Message
             if streak.current > 0 {
                 Text(encouragingMessage)
-                    .font(.caption)
-                    .tertiaryTextStyle()
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(AppConstants.Colors.accentText)
                     .multilineTextAlignment(.center)
                     .horizontalPadding()
             } else {
                 Text("Keep your streak alive - log today!")
-                    .font(.caption)
-                    .tertiaryTextStyle()
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(AppConstants.Colors.secondaryText)
                     .multilineTextAlignment(.center)
                     .horizontalPadding()
             }

@@ -25,9 +25,9 @@ struct ContentView: View {
             // MARK: - Timeline Tab
             VStack(spacing: 0) {
                 // Header with app title and main action
-                VStack(spacing: 16) {
+                VStack(spacing: AppConstants.Spacing.xl) {
                     // App Title
-                    VStack(spacing: AppConstants.Spacing.xs) {
+                    VStack(spacing: AppConstants.Spacing.sm) {
                         Text(AppConstants.appName)
                             .font(.largeTitle)
                             .fontWeight(.bold)
@@ -37,7 +37,7 @@ struct ContentView: View {
                             .font(.subheadline)
                             .secondaryTextStyle()
                     }
-                    .padding(.top, AppConstants.Spacing.xl)
+                    .padding(.top, AppConstants.Spacing.xxxl)
                     
                     // Main Log Day Button
                     Button(action: {
@@ -46,17 +46,18 @@ struct ContentView: View {
                         impactFeedback.impactOccurred()
                         showingNewEntry = true
                     }) {
-                        HStack(spacing: AppConstants.Spacing.sm) {
+                        HStack(spacing: AppConstants.Spacing.md) {
                             Image(systemName: "plus")
                                 .font(.headline)
+                                .fontWeight(.semibold)
                             Text("Log Day")
                                 .font(.headline)
                                 .fontWeight(.semibold)
                         }
-                        .primaryTextStyle()
+                        .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, AppConstants.Spacing.lg)
-                        .buttonGradientStyle()
+                        .primaryButtonStyle()
                     }
                     .accessibilityLabel(AppConstants.Accessibility.logDayButton)
                     .horizontalPadding()
@@ -68,7 +69,7 @@ struct ContentView: View {
                         .horizontalPadding()
                 }
                 .padding(.bottom, AppConstants.Spacing.xl)
-                .primaryGradientBackground()
+                .cleanBackground()
                 
                 // Timeline showing all journal entries
                 TimelineView(journalManager: journalManager)
@@ -85,7 +86,7 @@ struct ContentView: View {
                     Text("Calendar")
                 }
         }
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
         .sheet(isPresented: $showingNewEntry) {
             NewEntryView(journalManager: journalManager)
         }

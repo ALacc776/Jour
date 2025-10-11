@@ -35,6 +35,11 @@ extension View {
         )
     }
     
+    /// Applies a clean white background for cards and content areas
+    func cleanBackground() -> some View {
+        self.background(AppConstants.Colors.secondaryBackground)
+    }
+    
     // MARK: - Card Styling
     
     /// Applies the standard card styling used for journal entries
@@ -42,10 +47,10 @@ extension View {
         self
             .padding(AppConstants.Spacing.lg)
             .background(
-                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
                     .fill(AppConstants.Colors.cardBackground)
                     .overlay(
-                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
                             .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
                     )
             )
@@ -54,6 +59,22 @@ extension View {
                 radius: AppConstants.Shadows.card.radius,
                 x: AppConstants.Shadows.card.x,
                 y: AppConstants.Shadows.card.y
+            )
+    }
+    
+    /// Applies elevated card styling for important content
+    func elevatedCardStyle() -> some View {
+        self
+            .padding(AppConstants.Spacing.xl)
+            .background(
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                    .fill(AppConstants.Colors.cardBackground)
+            )
+            .shadow(
+                color: AppConstants.Shadows.elevated.color,
+                radius: AppConstants.Shadows.elevated.radius,
+                x: AppConstants.Shadows.elevated.x,
+                y: AppConstants.Shadows.elevated.y
             )
     }
     
@@ -67,6 +88,30 @@ extension View {
             )
         )
         .cornerRadius(AppConstants.CornerRadius.md)
+    }
+    
+    /// Applies primary button styling
+    func primaryButtonStyle() -> some View {
+        self
+            .background(AppConstants.Colors.primaryButton)
+            .cornerRadius(AppConstants.CornerRadius.md)
+            .shadow(
+                color: AppConstants.Shadows.button.color,
+                radius: AppConstants.Shadows.button.radius,
+                x: AppConstants.Shadows.button.x,
+                y: AppConstants.Shadows.button.y
+            )
+    }
+    
+    /// Applies secondary button styling
+    func secondaryButtonStyle() -> some View {
+        self
+            .background(AppConstants.Colors.secondaryButton)
+            .cornerRadius(AppConstants.CornerRadius.md)
+            .overlay(
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                    .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
+            )
     }
     
     // MARK: - Text Styling

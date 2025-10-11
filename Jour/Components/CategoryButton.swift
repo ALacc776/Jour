@@ -25,10 +25,10 @@ struct CategoryButton: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 8) {
+            VStack(spacing: AppConstants.Spacing.sm) {
                 // Category emoji
                 Text(category.emoji)
-                    .font(.title)
+                    .font(.title2)
                     .scaleEffect(isSelected ? 1.1 : 1.0)
                     .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isSelected)
                 
@@ -36,47 +36,33 @@ struct CategoryButton: View {
                 Text(category.rawValue)
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.white)
+                    .foregroundColor(isSelected ? .white : AppConstants.Colors.primaryText)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
+            .padding(.vertical, AppConstants.Spacing.lg)
             .background(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
                     .fill(
                         isSelected ? 
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.blue.opacity(0.8),
-                                Color.blue.opacity(0.6)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ) :
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.white.opacity(0.2),
-                                Color.white.opacity(0.1)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                        AppConstants.Colors.accentButton :
+                        AppConstants.Colors.secondaryBackground
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
                             .stroke(
-                                isSelected ? Color.blue : Color.white.opacity(0.3), 
+                                isSelected ? AppConstants.Colors.accentButton : AppConstants.Colors.cardBorder, 
                                 lineWidth: isSelected ? 2 : 1
                             )
                     )
-                    .shadow(
-                        color: isSelected ? Color.blue.opacity(0.3) : Color.black.opacity(0.1), 
-                        radius: isSelected ? 8 : 4, 
-                        x: 0, 
-                        y: isSelected ? 4 : 2
-                    )
             )
-            .scaleEffect(isSelected ? 1.05 : 1.0)
+            .scaleEffect(isSelected ? 1.02 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+            .shadow(
+                color: isSelected ? AppConstants.Colors.accentButton.opacity(0.3) : AppConstants.Shadows.card.color,
+                radius: isSelected ? 8 : 4,
+                x: 0,
+                y: isSelected ? 4 : 2
+            )
         }
         .buttonStyle(PlainButtonStyle())
         .accessibilityLabel("\(category.rawValue) category")

@@ -24,14 +24,14 @@ struct EntryRowView: View {
                 HStack {
                     Text(category)
                         .font(.caption)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, AppConstants.Spacing.sm)
+                        .padding(.vertical, AppConstants.Spacing.xs)
                         .background(
                             Capsule()
-                                .fill(Color.blue.opacity(0.2))
+                                .fill(AppConstants.Colors.accentButton.opacity(0.1))
                         )
-                        .foregroundColor(.blue)
+                        .foregroundColor(AppConstants.Colors.accentButton)
                     
                     Spacer()
                 }
@@ -40,7 +40,7 @@ struct EntryRowView: View {
             // MARK: - Entry Content
             Text(entry.content)
                 .font(.body)
-                .primaryTextStyle()
+                .foregroundColor(AppConstants.Colors.primaryText)
                 .lineLimit(nil)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
@@ -49,14 +49,16 @@ struct EntryRowView: View {
                 if let time = entry.time {
                     Text(time)
                         .font(.caption)
-                        .tertiaryTextStyle()
+                        .fontWeight(.medium)
+                        .foregroundColor(AppConstants.Colors.secondaryText)
                 }
                 
                 Spacer()
                 
                 Text(entry.date, style: .time)
                     .font(.caption)
-                    .tertiaryTextStyle()
+                    .fontWeight(.medium)
+                    .foregroundColor(AppConstants.Colors.tertiaryText)
             }
         }
         .journalCardStyle()

@@ -65,14 +65,14 @@ struct NewEntryView: View {
             VStack(spacing: 0) {
                 if !hasSelectedEntryType {
                     // MARK: - Initial Selection Screen
-                    VStack(spacing: 24) {
+                    VStack(spacing: AppConstants.Spacing.xxxl) {
                         // Title
                         Text("What did you do today?")
                             .font(.largeTitle)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
+                            .foregroundColor(AppConstants.Colors.primaryText)
                             .multilineTextAlignment(.center)
-                            .padding(.top, 20)
+                            .padding(.top, AppConstants.Spacing.xxxl)
                         
                         // Category Selection Grid
                         LazyVGrid(
@@ -88,27 +88,28 @@ struct NewEntryView: View {
                                 }
                             }
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, AppConstants.Spacing.xl)
                         
                         // OR Separator
                         HStack {
                             Rectangle()
-                                .fill(Color.gray.opacity(0.3))
+                                .fill(AppConstants.Colors.cardBorder)
                                 .frame(height: 1)
                             
                             Text("OR")
                                 .font(.caption)
-                                .foregroundColor(.gray)
-                                .padding(.horizontal, 16)
+                                .fontWeight(.medium)
+                                .foregroundColor(AppConstants.Colors.tertiaryText)
+                                .padding(.horizontal, AppConstants.Spacing.lg)
                             
                             Rectangle()
-                                .fill(Color.gray.opacity(0.3))
+                                .fill(AppConstants.Colors.cardBorder)
                                 .frame(height: 1)
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, AppConstants.Spacing.xl)
                         
                         // Alternative Entry Options
-                        VStack(spacing: 12) {
+                        VStack(spacing: AppConstants.Spacing.md) {
                             Button(action: {
                                 selectFreeForm()
                             }) {
@@ -117,12 +118,17 @@ struct NewEntryView: View {
                                         .font(.title2)
                                     Text("Free write entry")
                                         .font(.headline)
-                                        .foregroundColor(.primary)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(AppConstants.Colors.primaryText)
                                     Spacer()
                                 }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(12)
+                                .padding(AppConstants.Spacing.lg)
+                                .background(AppConstants.Colors.secondaryBackground)
+                                .cornerRadius(AppConstants.CornerRadius.md)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                                        .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
+                                )
                             }
                             .buttonStyle(PlainButtonStyle())
                             
@@ -134,32 +140,28 @@ struct NewEntryView: View {
                                         .font(.title2)
                                     Text("Quick entry (one line = one entry)")
                                         .font(.headline)
-                                        .foregroundColor(.primary)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(AppConstants.Colors.primaryText)
                                     Spacer()
                                 }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(12)
+                                .padding(AppConstants.Spacing.lg)
+                                .background(AppConstants.Colors.secondaryBackground)
+                                .cornerRadius(AppConstants.CornerRadius.md)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                                        .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
+                                )
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, AppConstants.Spacing.xl)
                         
                         Spacer()
                     }
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.indigo.opacity(0.3),
-                                Color.purple.opacity(0.2)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .cleanBackground()
                 } else {
                     // MARK: - Content Input Screen
-                    VStack(spacing: 20) {
+                    VStack(spacing: AppConstants.Spacing.xl) {
                         // Back button and title
                         HStack {
                             Button(action: {
@@ -167,14 +169,16 @@ struct NewEntryView: View {
                             }) {
                                 Image(systemName: "chevron.left")
                                     .font(.headline)
-                                    .foregroundColor(.blue)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppConstants.Colors.accentButton)
                             }
                             
                             Spacer()
                             
                             Text(entryTypeTitle)
                                 .font(.headline)
-                                .foregroundColor(.white)
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppConstants.Colors.primaryText)
                             
                             Spacer()
                             
@@ -182,50 +186,53 @@ struct NewEntryView: View {
                             Color.clear
                                 .frame(width: 20, height: 20)
                         }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 10)
+                        .padding(.horizontal, AppConstants.Spacing.xl)
+                        .padding(.top, AppConstants.Spacing.lg)
                         
                         // Time Input (only for categorized entries)
                         if !isFreeForm && selectedCategory != nil {
                             HStack {
                                 Text("Time (optional):")
                                     .font(.headline)
-                                    .foregroundColor(.white)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(AppConstants.Colors.primaryText)
                                 
                                 TextField("e.g., 14:30", text: $selectedTime)
                                     .textFieldStyle(RoundedBorderTextFieldStyle())
                                     .keyboardType(.numbersAndPunctuation)
-                                    .colorScheme(.dark)
+                                    .colorScheme(.light)
                             }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, AppConstants.Spacing.xl)
                         }
                         
                         // Content Input
-                        VStack(alignment: .leading, spacing: 8) {
+                        VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
                             Text(contentInputTitle)
                                 .font(.headline)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 20)
+                                .fontWeight(.medium)
+                                .foregroundColor(AppConstants.Colors.primaryText)
+                                .padding(.horizontal, AppConstants.Spacing.xl)
                             
                             if isQuickEntry {
                                 Text("Each line will become a separate entry")
                                     .font(.caption)
-                                    .foregroundColor(.white.opacity(0.7))
-                                    .padding(.horizontal, 20)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(AppConstants.Colors.secondaryText)
+                                    .padding(.horizontal, AppConstants.Spacing.xl)
                             }
                             
                             ZStack(alignment: .topLeading) {
                                 TextEditor(text: $entryText)
-                                    .padding()
+                                    .padding(AppConstants.Spacing.lg)
                                     .font(.body)
-                                    .colorScheme(.dark)
+                                    .colorScheme(.light)
                                     .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color.white.opacity(0.3), lineWidth: 1)
+                                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                                            .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
                                     )
                                     .background(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color.white.opacity(0.1))
+                                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                                            .fill(AppConstants.Colors.secondaryBackground)
                                     )
                                     .scrollContentBackground(.hidden)
                                     .onSubmit {
@@ -239,46 +246,37 @@ struct NewEntryView: View {
                                 if isQuickEntry && entryText.isEmpty {
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text("Went to sleep")
-                                            .foregroundColor(.white.opacity(0.5))
+                                            .foregroundColor(AppConstants.Colors.placeholderText)
                                             .font(.body)
                                         Text("met james")
-                                            .foregroundColor(.white.opacity(0.5))
+                                            .foregroundColor(AppConstants.Colors.placeholderText)
                                             .font(.body)
                                         Text("ate food")
-                                            .foregroundColor(.white.opacity(0.5))
+                                            .foregroundColor(AppConstants.Colors.placeholderText)
                                             .font(.body)
                                     }
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, AppConstants.Spacing.lg)
+                                    .padding(.vertical, AppConstants.Spacing.md)
                                     .allowsHitTesting(false)
                                 }
                             }
-                            .padding(.horizontal, 20)
+                            .padding(.horizontal, AppConstants.Spacing.xl)
                         }
                         
                         Spacer()
                     }
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.indigo.opacity(0.3),
-                                Color.purple.opacity(0.2)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .cleanBackground()
                 }
         }
         .navigationTitle("Log Day")
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(.dark)
+        .preferredColorScheme(.light)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Cancel") {
                     dismiss()
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppConstants.Colors.primaryText)
             }
             
             if hasSelectedEntryType {
@@ -290,7 +288,8 @@ struct NewEntryView: View {
                         saveEntry()
                     }
                     .disabled(entryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    .foregroundColor(.white)
+                    .foregroundColor(AppConstants.Colors.accentButton)
+                    .fontWeight(.semibold)
                 }
             }
             
@@ -299,7 +298,8 @@ struct NewEntryView: View {
                 Button("Done") {
                     hideKeyboard()
                 }
-                .foregroundColor(.white)
+                .foregroundColor(AppConstants.Colors.accentButton)
+                .fontWeight(.semibold)
             }
         }
         }

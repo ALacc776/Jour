@@ -27,97 +27,86 @@ struct CalendarView: View {
         NavigationView {
             VStack(spacing: 0) {
                 // MARK: - Calendar Picker
-                VStack(spacing: 16) {
+                VStack(spacing: AppConstants.Spacing.lg) {
                     DatePicker("Select Date", selection: $selectedDate, displayedComponents: .date)
                         .datePickerStyle(GraphicalDatePickerStyle())
-                        .colorScheme(.dark)
-                        .padding()
+                        .colorScheme(.light)
+                        .padding(AppConstants.Spacing.lg)
                         .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white.opacity(0.1))
+                            RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                .fill(AppConstants.Colors.secondaryBackground)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                        .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
                                 )
                         )
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
+                        .shadow(
+                            color: AppConstants.Shadows.card.color,
+                            radius: AppConstants.Shadows.card.radius,
+                            x: AppConstants.Shadows.card.x,
+                            y: AppConstants.Shadows.card.y
+                        )
+                        .padding(.horizontal, AppConstants.Spacing.xl)
+                        .padding(.top, AppConstants.Spacing.xl)
                     
                     // MARK: - Entries for Selected Date
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: AppConstants.Spacing.lg) {
                         HStack {
                             Text("Entries for \(formatDate(selectedDate))")
                                 .font(.headline)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppConstants.Colors.primaryText)
                             
                             Spacer()
                             
                             Button(action: {
                                 showingEntryModal = true
                             }) {
-                                HStack(spacing: 6) {
+                                HStack(spacing: AppConstants.Spacing.xs) {
                                     Image(systemName: "plus")
                                         .font(.caption)
+                                        .fontWeight(.semibold)
                                     Text("Add Entry")
                                         .font(.subheadline)
-                                        .fontWeight(.medium)
+                                        .fontWeight(.semibold)
                                 }
                                 .foregroundColor(.white)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color.blue.opacity(0.8),
-                                            Color.blue.opacity(0.6)
-                                        ]),
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    )
-                                )
-                                .cornerRadius(12)
+                                .padding(.horizontal, AppConstants.Spacing.lg)
+                                .padding(.vertical, AppConstants.Spacing.sm)
+                                .primaryButtonStyle()
                             }
                         }
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, AppConstants.Spacing.xl)
                         
                         if entriesForSelectedDate.isEmpty {
                             // MARK: - Empty State for Selected Date
-                            VStack(spacing: 16) {
+                            VStack(spacing: AppConstants.Spacing.lg) {
                                 Image(systemName: "calendar.badge.plus")
                                     .font(.system(size: 50))
-                                    .foregroundColor(.white.opacity(0.6))
+                                    .foregroundColor(AppConstants.Colors.tertiaryText)
                                 
                                 Text("No entries for this date")
                                     .font(.body)
-                                    .foregroundColor(.white.opacity(0.7))
+                                    .fontWeight(.medium)
+                                    .foregroundColor(AppConstants.Colors.secondaryText)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 40)
+                            .padding(.vertical, AppConstants.Spacing.xxxxl)
                         } else {
                             // MARK: - List of Entries
                             ScrollView {
-                                LazyVStack(spacing: 12) {
+                                LazyVStack(spacing: AppConstants.Spacing.md) {
                                     ForEach(entriesForSelectedDate) { entry in
                                         EntryRowView(entry: entry)
                                     }
                                 }
-                                .padding(.horizontal, 20)
-                                .padding(.bottom, 20)
+                                .padding(.horizontal, AppConstants.Spacing.xl)
+                                .padding(.bottom, AppConstants.Spacing.xl)
                             }
                         }
                     }
                 }
-                .background(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.indigo.opacity(0.1),
-                            Color.purple.opacity(0.05)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+                .cleanBackground()
                 
                 Spacer()
             }

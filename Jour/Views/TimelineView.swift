@@ -22,58 +22,50 @@ struct TimelineView: View {
             VStack(spacing: 0) {
                 if journalManager.entries.isEmpty {
                     // MARK: - Empty State
-                    VStack(spacing: 24) {
+                    VStack(spacing: AppConstants.Spacing.xxxl) {
                         Image(systemName: "book.closed")
                             .font(.system(size: 80))
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(AppConstants.Colors.tertiaryText)
                         
-                        VStack(spacing: 8) {
+                        VStack(spacing: AppConstants.Spacing.sm) {
                             Text("Your Journal is Empty")
                                 .font(.title2)
                                 .fontWeight(.semibold)
-                                .foregroundColor(.white)
+                                .foregroundColor(AppConstants.Colors.primaryText)
                             
                             Text("Start writing your first entry")
                                 .font(.body)
-                                .foregroundColor(.white.opacity(0.7))
+                                .foregroundColor(AppConstants.Colors.secondaryText)
                         }
                     }
-                    .padding(40)
+                    .padding(AppConstants.Spacing.xxxxl)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.indigo.opacity(0.1),
-                                Color.purple.opacity(0.05)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .cleanBackground()
                 } else {
                     // MARK: - Timeline of Entries
                     ScrollView {
-                        LazyVStack(spacing: 16) {
+                        LazyVStack(spacing: AppConstants.Spacing.lg) {
                             ForEach(groupedEntries, id: \.0) { date, entries in
-                                VStack(alignment: .leading, spacing: 12) {
+                                VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
                                     // Date Header
                                     HStack {
                                         Image(systemName: "clock")
-                                            .foregroundColor(.white.opacity(0.7))
+                                            .foregroundColor(AppConstants.Colors.accentButton)
                                             .font(.caption)
+                                            .fontWeight(.medium)
                                         
                                         Text(formatDate(date))
                                             .font(.headline)
                                             .fontWeight(.semibold)
-                                            .foregroundColor(.white)
+                                            .foregroundColor(AppConstants.Colors.primaryText)
                                         
                                         Spacer()
                                     }
-                                    .padding(.horizontal, 20)
-                                    .padding(.top, 8)
+                                    .padding(.horizontal, AppConstants.Spacing.xl)
+                                    .padding(.top, AppConstants.Spacing.sm)
                                     
                                     // Entries for this date
-                                    VStack(spacing: 8) {
+                                    VStack(spacing: AppConstants.Spacing.sm) {
                                         ForEach(entries) { entry in
                                             EntryRowView(entry: entry)
                                                 .swipeActions(edge: .trailing) {
@@ -85,11 +77,11 @@ struct TimelineView: View {
                                                 }
                                         }
                                     }
-                                    .padding(.horizontal, 20)
+                                    .padding(.horizontal, AppConstants.Spacing.xl)
                                 }
                             }
                         }
-                        .padding(.vertical, 20)
+                        .padding(.vertical, AppConstants.Spacing.xl)
                     }
                     .refreshable {
                         // Add haptic feedback for refresh
@@ -99,16 +91,7 @@ struct TimelineView: View {
                         // Simulate refresh delay for better UX
                         try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
                     }
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.indigo.opacity(0.1),
-                                Color.purple.opacity(0.05)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .cleanBackground()
                 }
             }
             .navigationTitle("Timeline")
