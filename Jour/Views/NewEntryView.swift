@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-/// Modal view for creating new journal entries
-/// Supports both categorized and free-form entry modes with optional time and date selection
+/// Ultra-minimal modal view for creating new journal entries
+/// Simple, clean design with time-based prompts and entry modes
 struct NewEntryView: View {
     // MARK: - Properties
     
@@ -21,31 +21,26 @@ struct NewEntryView: View {
     /// The main text content of the journal entry
     @State private var entryText = ""
     
-    /// Selected category for categorized entries
-    @State private var selectedCategory: JournalCategory?
+    /// Selected time period for time-based entries
+    @State private var selectedTimePeriod: TimePeriod?
     
     /// Optional time string for the entry
     @State private var selectedTime = ""
     
-    /// Whether the entry is in free-form mode (no category)
+    /// Whether the entry is in free-form mode (no prompt)
     @State private var isFreeForm = false
     
     /// Whether the entry is in quick entry mode (multiple entries from lines)
     @State private var isQuickEntry = false
     
-    /// Whether a category or entry type has been selected (shows content input)
+    /// Whether a time period or entry type has been selected (shows content input)
     @State private var hasSelectedEntryType = false
     
     /// Optional specific date for the entry (if not provided, uses current date)
     @State private var selectedDate: Date?
     
-    // MARK: - Constants
-    
-    /// Number of columns in the category selection grid
-    private let categoryGridColumns = AppConstants.Layout.categoryGridColumns
-    
-    /// Vertical spacing between grid items
-    private let categoryGridSpacing = AppConstants.Layout.categoryGridSpacing
+    /// Focus state for the text editor
+    @FocusState private var isTextEditorFocused: Bool
     
     // MARK: - Initialization
     
@@ -64,97 +59,78 @@ struct NewEntryView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 if !hasSelectedEntryType {
-                    // MARK: - Initial Selection Screen
-                    VStack(spacing: AppConstants.Spacing.xxxl) {
-                        // Title
-                        Text("What did you do today?")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(AppConstants.Colors.primaryText)
-                            .multilineTextAlignment(.center)
-                            .padding(.top, AppConstants.Spacing.xxxl)
+                    // MARK: - Ultra-Minimal Selection Screen
+                    VStack(spacing: 0) {
+                        Spacer()
+                            .frame(height: 60)
                         
-                        // Category Selection Grid
-                        LazyVGrid(
-                            columns: Array(repeating: GridItem(.flexible()), count: categoryGridColumns),
-                            spacing: categoryGridSpacing
-                        ) {
-                            ForEach(JournalCategory.allCases, id: \.self) { category in
-                                CategoryButton(
-                                    category: category,
-                                    isSelected: selectedCategory == category
-                                ) {
-                                    selectCategory(category)
+                        // Simple title
+                        Text("What did you do?")
+                            .font(.title2)
+                            .fontWeight(.medium)
+                            .foregroundColor(AppConstants.Colors.primaryText)
+                        
+                        Spacer()
+                            .frame(height: 60)
+                        
+                        // Time periods - clean buttons
+                        VStack(spacing: 28) {
+                            ForEach(TimePeriod.allCases, id: \.self) { period in
+                                Button(action: {
+                                    selectTimePeriod(period)
+                                }) {
+                                    HStack(spacing: 16) {
+                                        Text(period.emoji)
+                                            .font(.title2)
+                                        Text(period.rawValue)
+                                            .font(.body)
+                                            .foregroundColor(AppConstants.Colors.primaryText)
+                                        Spacer()
+                                    }
                                 }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
-                        .padding(.horizontal, AppConstants.Spacing.xl)
+                        .padding(.horizontal, 40)
                         
-                        // OR Separator
-                        HStack {
-                            Rectangle()
-                                .fill(AppConstants.Colors.cardBorder)
-                                .frame(height: 1)
-                            
-                            Text("OR")
-                                .font(.caption)
-                                .fontWeight(.medium)
-                                .foregroundColor(AppConstants.Colors.tertiaryText)
-                                .padding(.horizontal, AppConstants.Spacing.lg)
-                            
-                            Rectangle()
-                                .fill(AppConstants.Colors.cardBorder)
-                                .frame(height: 1)
-                        }
-                        .padding(.horizontal, AppConstants.Spacing.xl)
+                        // Minimal divider
+                        Rectangle()
+                            .fill(AppConstants.Colors.cardBorder)
+                            .frame(height: 1)
+                            .frame(width: 100)
+                            .padding(.vertical, 40)
                         
-                        // Alternative Entry Options
-                        VStack(spacing: AppConstants.Spacing.md) {
+                        // Alternative entry options - clean buttons
+                        VStack(spacing: 28) {
                             Button(action: {
                                 selectFreeForm()
                             }) {
-                                HStack {
+                                HStack(spacing: 16) {
                                     Text("📝")
                                         .font(.title2)
-                                    Text("Free write entry")
-                                        .font(.headline)
-                                        .fontWeight(.medium)
+                                    Text("Free write")
+                                        .font(.body)
                                         .foregroundColor(AppConstants.Colors.primaryText)
                                     Spacer()
                                 }
-                                .padding(AppConstants.Spacing.lg)
-                                .background(AppConstants.Colors.secondaryBackground)
-                                .cornerRadius(AppConstants.CornerRadius.md)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
-                                        .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
-                                )
                             }
                             .buttonStyle(PlainButtonStyle())
                             
                             Button(action: {
                                 selectQuickEntry()
                             }) {
-                                HStack {
+                                HStack(spacing: 16) {
                                     Text("⚡")
                                         .font(.title2)
-                                    Text("Quick entry (one line = one entry)")
-                                        .font(.headline)
-                                        .fontWeight(.medium)
+                                    Text("Quick entry")
+                                        .font(.body)
                                         .foregroundColor(AppConstants.Colors.primaryText)
                                     Spacer()
                                 }
-                                .padding(AppConstants.Spacing.lg)
-                                .background(AppConstants.Colors.secondaryBackground)
-                                .cornerRadius(AppConstants.CornerRadius.md)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
-                                        .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
-                                )
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
-                        .padding(.horizontal, AppConstants.Spacing.xl)
+                        .padding(.horizontal, 40)
                         
                         Spacer()
                     }
@@ -189,22 +165,6 @@ struct NewEntryView: View {
                         .padding(.horizontal, AppConstants.Spacing.xl)
                         .padding(.top, AppConstants.Spacing.lg)
                         
-                        // Time Input (only for categorized entries)
-                        if !isFreeForm && selectedCategory != nil {
-                            HStack {
-                                Text("Time (optional):")
-                                    .font(.headline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(AppConstants.Colors.primaryText)
-                                
-                                TextField("e.g., 14:30", text: $selectedTime)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .keyboardType(.numbersAndPunctuation)
-                                    .colorScheme(.light)
-                            }
-                            .padding(.horizontal, AppConstants.Spacing.xl)
-                        }
-                        
                         // Content Input
                         VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
                             Text(contentInputTitle)
@@ -225,7 +185,7 @@ struct NewEntryView: View {
                                 TextEditor(text: $entryText)
                                     .padding(AppConstants.Spacing.lg)
                                     .font(.body)
-                                    .colorScheme(.light)
+                                    .focused($isTextEditorFocused)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
                                             .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
@@ -241,17 +201,23 @@ struct NewEntryView: View {
                                             saveEntry()
                                         }
                                     }
+                                    .onAppear {
+                                        // Auto-focus when text editor appears
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                            isTextEditorFocused = true
+                                        }
+                                    }
                                 
                                 // Placeholder text for quick entry
                                 if isQuickEntry && entryText.isEmpty {
                                     VStack(alignment: .leading, spacing: 4) {
-                                        Text("Went to sleep")
+                                        Text("went to lunch")
                                             .foregroundColor(AppConstants.Colors.placeholderText)
                                             .font(.body)
-                                        Text("met james")
+                                        Text("called mom")
                                             .foregroundColor(AppConstants.Colors.placeholderText)
                                             .font(.body)
-                                        Text("ate food")
+                                        Text("worked out")
                                             .foregroundColor(AppConstants.Colors.placeholderText)
                                             .font(.body)
                                     }
@@ -312,9 +278,9 @@ struct NewEntryView: View {
         if isQuickEntry {
             return "Quick Entry"
         } else if isFreeForm {
-            return "Free Write Entry"
-        } else if let category = selectedCategory {
-            return category.rawValue
+            return "Free Write"
+        } else if let period = selectedTimePeriod {
+            return period.rawValue
         } else {
             return "Entry"
         }
@@ -324,6 +290,8 @@ struct NewEntryView: View {
     private var contentInputTitle: String {
         if isQuickEntry {
             return "What did you do today? (one per line)"
+        } else if let period = selectedTimePeriod {
+            return period.prompt
         } else {
             return "What happened?"
         }
@@ -346,13 +314,13 @@ struct NewEntryView: View {
     
     // MARK: - Private Methods
     
-    /// Handles category selection and transitions to content input
-    private func selectCategory(_ category: JournalCategory) {
+    /// Handles time period selection and transitions to content input
+    private func selectTimePeriod(_ period: TimePeriod) {
         // Add haptic feedback
         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
         impactFeedback.impactOccurred()
         
-        selectedCategory = category
+        selectedTimePeriod = period
         isFreeForm = false
         isQuickEntry = false
         hasSelectedEntryType = true
@@ -364,7 +332,7 @@ struct NewEntryView: View {
         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
         impactFeedback.impactOccurred()
         
-        selectedCategory = nil
+        selectedTimePeriod = nil
         isFreeForm = true
         isQuickEntry = false
         hasSelectedEntryType = true
@@ -376,7 +344,7 @@ struct NewEntryView: View {
         let impactFeedback = UIImpactFeedbackGenerator(style: .light)
         impactFeedback.impactOccurred()
         
-        selectedCategory = nil
+        selectedTimePeriod = nil
         isFreeForm = false
         isQuickEntry = true
         hasSelectedEntryType = true
@@ -385,7 +353,7 @@ struct NewEntryView: View {
     /// Returns to the initial selection screen
     private func goBackToSelection() {
         hasSelectedEntryType = false
-        selectedCategory = nil
+        selectedTimePeriod = nil
         isFreeForm = false
         isQuickEntry = false
         entryText = ""
@@ -410,8 +378,8 @@ struct NewEntryView: View {
                 journalManager.saveEntry(entry)
             }
         } else {
-            // Single entry
-            let category = isFreeForm ? nil : selectedCategory?.rawValue
+            // Single entry - store time period as category if selected
+            let category = selectedTimePeriod?.rawValue
             let entry = JournalEntry(content: content, category: category, date: date, time: time)
             journalManager.saveEntry(entry)
         }

@@ -25,6 +25,8 @@ struct MenuView: View {
     @State private var showingAbout = false
     @State private var showingDeleteConfirmation = false
     @State private var showingCustomRangeCopy = false
+    @State private var showingPrivacyPolicy = false
+    @State private var showingSupport = false
     @State private var showingAlert = false
     @State private var alertMessage = ""
     
@@ -84,6 +86,27 @@ struct MenuView: View {
                     }
                 } header: {
                     Text("App Information")
+                }
+                
+                // MARK: - Privacy & Support Section
+                Section {
+                    // Privacy Policy
+                    Button(action: {
+                        showingPrivacyPolicy = true
+                    }) {
+                        Label("Privacy Policy", systemImage: "hand.raised.fill")
+                            .foregroundColor(AppConstants.Colors.primaryText)
+                    }
+                    
+                    // Support
+                    Button(action: {
+                        showingSupport = true
+                    }) {
+                        Label("Help & Support", systemImage: "questionmark.circle.fill")
+                            .foregroundColor(AppConstants.Colors.primaryText)
+                    }
+                } header: {
+                    Text("Legal & Support")
                 }
                 
                 // MARK: - Export to Clipboard Section
@@ -153,6 +176,12 @@ struct MenuView: View {
         }
         .sheet(isPresented: $showingCustomRangeCopy) {
             CustomRangeCopyView(journalManager: journalManager)
+        }
+        .sheet(isPresented: $showingPrivacyPolicy) {
+            PrivacyPolicyView()
+        }
+        .sheet(isPresented: $showingSupport) {
+            SupportView()
         }
         .alert("Delete All Data", isPresented: $showingDeleteConfirmation) {
             Button("Cancel", role: .cancel) { }

@@ -117,29 +117,32 @@ struct JournalStreak: Codable {
     }
 }
 
-/// Predefined categories for journal entries to help users organize their thoughts
-/// Each category has a human-readable name and an associated emoji for visual representation
-enum JournalCategory: String, CaseIterable, Codable {
+/// Time periods for organizing journal entries by part of day
+/// Simple, universal prompts that help users recall their activities
+enum TimePeriod: String, CaseIterable, Codable {
     // MARK: - Cases
     
-    case metWith = "Met with"
-    case learned = "Learned"
-    case workedOn = "Worked on"
-    case wentTo = "Went to"
-    case finished = "Finished"
-    case felt = "Felt"
+    case morning = "Morning"
+    case afternoon = "Afternoon"
+    case night = "Night"
     
     // MARK: - Computed Properties
     
-    /// Returns the emoji associated with each category for visual representation
+    /// Returns the emoji associated with each time period
     var emoji: String {
         switch self {
-        case .metWith: return "👥"
-        case .learned: return "📚"
-        case .workedOn: return "💼"
-        case .wentTo: return "🚀"
-        case .finished: return "✅"
-        case .felt: return "💭"
+        case .morning: return "🌅"
+        case .afternoon: return "☀️"
+        case .night: return "🌙"
+        }
+    }
+    
+    /// Returns the prompt text for the time period
+    var prompt: String {
+        switch self {
+        case .morning: return "What did you do in the morning?"
+        case .afternoon: return "What did you do in the afternoon?"
+        case .night: return "What did you do at night?"
         }
     }
 }
