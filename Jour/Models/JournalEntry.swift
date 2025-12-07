@@ -7,13 +7,29 @@
 
 import Foundation
 
+/// Location information for a journal entry
+/// Stores coordinates and human-readable location details
+struct LocationData: Codable, Equatable {
+    /// Latitude coordinate
+    let latitude: Double
+    
+    /// Longitude coordinate
+    let longitude: Double
+    
+    /// Human-readable place name (e.g., "Starbucks")
+    let placeName: String?
+    
+    /// Full address (e.g., "123 Main St, San Francisco, CA")
+    let address: String?
+}
+
 /// Represents a single journal entry with content, category, and timestamp information.
 /// This is the core data model for storing user's daily journal entries.
 struct JournalEntry: Identifiable, Codable {
     // MARK: - Properties
     
     /// Unique identifier for the journal entry
-    let id = UUID()
+    let id: UUID
     
     /// The main content/text of the journal entry
     let content: String
@@ -27,6 +43,12 @@ struct JournalEntry: Identifiable, Codable {
     /// Optional time string for when the event occurred (e.g., "14:30")
     let time: String?
     
+    /// Filename of attached photo (stored in Documents/photos/)
+    let photoFilename: String?
+    
+    /// Location data (automatically captured)
+    let location: LocationData?
+    
     // MARK: - Initializers
     
     /// Creates a new journal entry with the current date
@@ -34,11 +56,17 @@ struct JournalEntry: Identifiable, Codable {
     ///   - content: The main text content of the entry
     ///   - category: Optional category to classify the entry
     ///   - time: Optional time string for when the event occurred
-    init(content: String, category: String? = nil, time: String? = nil) {
+    ///   - photoFilename: Optional photo filename
+    ///   - location: Optional location data
+    ///   - id: Optional UUID to preserve when updating entries
+    init(content: String, category: String? = nil, time: String? = nil, photoFilename: String? = nil, location: LocationData? = nil, id: UUID = UUID()) {
+        self.id = id
         self.content = content
         self.category = category
         self.date = Date()
         self.time = time
+        self.photoFilename = photoFilename
+        self.location = location
     }
     
     /// Creates a new journal entry with a specific date
@@ -47,11 +75,17 @@ struct JournalEntry: Identifiable, Codable {
     ///   - category: Optional category to classify the entry
     ///   - date: The specific date for this entry
     ///   - time: Optional time string for when the event occurred
-    init(content: String, category: String?, date: Date, time: String? = nil) {
+    ///   - photoFilename: Optional photo filename
+    ///   - location: Optional location data
+    ///   - id: Optional UUID to preserve when updating entries
+    init(content: String, category: String?, date: Date, time: String? = nil, photoFilename: String? = nil, location: LocationData? = nil, id: UUID = UUID()) {
+        self.id = id
         self.content = content
         self.category = category
         self.date = date
         self.time = time
+        self.photoFilename = photoFilename
+        self.location = location
     }
 }
 

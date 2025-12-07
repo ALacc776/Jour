@@ -21,6 +21,9 @@ struct CalendarView: View {
     /// Controls the presentation of the new entry sheet
     @State private var showingEntryModal = false
     
+    /// Controls whether to show copy confirmation alert
+    @State private var showingCopyAlert = false
+    
     // MARK: - Body
     
     var body: some View {
@@ -59,6 +62,17 @@ struct CalendarView: View {
                             
                             Spacer()
                             
+                            // Copy Day button
+                            Button(action: {
+                                copyDayToClipboard()
+                            }) {
+                                Image(systemName: "doc.on.clipboard")
+                                    .font(.headline)
+                                    .foregroundColor(AppConstants.Colors.primaryText)
+                                    .frame(width: 44, height: 44)
+                            }
+                            
+                            // Add Entry button
                             Button(action: {
                                 showingEntryModal = true
                             }) {
@@ -66,7 +80,7 @@ struct CalendarView: View {
                                     Image(systemName: "plus")
                                         .font(.caption)
                                         .fontWeight(.semibold)
-                                    Text("Add Entry")
+                                    Text("Add")
                                         .font(.subheadline)
                                         .fontWeight(.semibold)
                                 }
@@ -115,6 +129,11 @@ struct CalendarView: View {
             .sheet(isPresented: $showingEntryModal) {
                 NewEntryView(journalManager: journalManager, selectedDate: selectedDate)
             }
+            .alert("Copied to Clipboard", isPresented: $showingCopyAlert) {
+                Button("OK") { }
+            } message: {
+                Text("Entries for \(formatDateShort(selectedDate)) copied to clipboard")
+            }
         }
     }
     
@@ -134,5 +153,34 @@ struct CalendarView: View {
         let formatter = DateFormatter()
         formatter.dateStyle = .full
         return formatter.string(from: date)
+    }
+    
+    /// Formats a date for short display (e.g., "Dec 6")
+    /// - Parameter date: The date to format
+    /// - Returns: Short formatted date string
+    private func formatDateShort(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
+    }
+    
+    /// Copies the selected day's entries to clipboard
+    private func copyDayToClipboard() {
+        let entries = entriesForSelectedDate
+        
+        guard !entries.isEmpty else {
+            // No entries to copy
+            return
+        }
+        
+        let formatted = journalManager.formatEntriesForClipboard(entries)
+        UIPasteboard.general.string = formatted
+        
+        // Add haptic feedback
+        let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+        impactFeedback.impactOccurred()
+        
+        // Show confirmation
+        showingCopyAlert = true
     }
 }

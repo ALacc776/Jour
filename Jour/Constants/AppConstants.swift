@@ -13,8 +13,8 @@ enum AppConstants {
     
     // MARK: - App Information
     
-    static let appName = "QuickJournal"
-    static let appTagline = "Reflect on your day, build mindful habits"
+    static let appName = "DayLog"
+    static let appTagline = "Quick daily logging, simple and fast"
     
     // MARK: - Colors
     

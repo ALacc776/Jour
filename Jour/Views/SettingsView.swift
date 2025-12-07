@@ -248,10 +248,8 @@ struct SettingsView: View {
     /// Deletes all journal data
     private func deleteAllData() {
         journalManager.entries.removeAll()
-        // Trigger save by adding and removing an entry
-        let tempEntry = JournalEntry(content: "temp")
-        journalManager.saveEntry(tempEntry)
-        journalManager.deleteEntry(tempEntry)
+        journalManager.saveEntries()
+        journalManager.updateStreak()
         
         // Reset privacy preferences
         privacyManager.resetPrivacyPreferences()
@@ -287,7 +285,7 @@ struct PrivacyPolicyView: View {
                             .fontWeight(.semibold)
                             .foregroundColor(AppConstants.Colors.primaryText)
                         
-                        Text("QuickJournal stores your journal entries locally on your device. We do not collect, store, or transmit your personal data to our servers. Your privacy is our priority.")
+                        Text("DayLog stores your daily entries locally on your device. We do not collect, store, or transmit your personal data to our servers. Your privacy is our priority.")
                             .foregroundColor(AppConstants.Colors.secondaryText)
                             .padding()
                             .background(AppConstants.Colors.secondaryBackground)
@@ -385,12 +383,12 @@ struct AboutView: View {
                         )
                     
                     VStack(spacing: AppConstants.Spacing.sm) {
-                        Text("QuickJournal")
+                        Text(AppConstants.appName)
                             .font(.largeTitle)
                             .fontWeight(.bold)
                             .foregroundColor(AppConstants.Colors.primaryText)
                         
-                        Text("Reflect on your day, build mindful habits")
+                        Text(AppConstants.appTagline)
                             .font(.subheadline)
                             .foregroundColor(AppConstants.Colors.secondaryText)
                             .multilineTextAlignment(.center)
@@ -407,12 +405,12 @@ struct AboutView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
-                        Text("About QuickJournal")
+                        Text("About DayLog")
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundColor(AppConstants.Colors.primaryText)
                         
-                        Text("QuickJournal is a simple, privacy-focused journaling app designed to help you reflect on your day and build mindful habits. Your thoughts and memories stay with you and you alone.")
+                        Text("DayLog is designed for speed and simplicity. Open the app, type what you did, and you're done. No forms, no categories to select, no complex features. Just quick, effortless daily logging.")
                             .foregroundColor(AppConstants.Colors.secondaryText)
                         
                         Text("Features:")
@@ -421,23 +419,24 @@ struct AboutView: View {
                             .foregroundColor(AppConstants.Colors.primaryText)
                         
                         VStack(alignment: .leading, spacing: AppConstants.Spacing.xs) {
-                            Text("• Local data storage with encryption")
-                            Text("• Streak tracking and motivation")
-                            Text("• Multiple entry categories")
-                            Text("• Calendar and timeline views")
-                            Text("• Data export and backup")
-                            Text("• Privacy-first design")
+                            Text("• Instant input - start typing immediately")
+                            Text("• Quick-add buttons for one-tap logging")
+                            Text("• Full entry editing support")
+                            Text("• Fast search across all entries")
+                            Text("• Activity heat map and streak tracking")
+                            Text("• Daily reminders to stay consistent")
+                            Text("• Local storage with optional encryption")
                         }
                         .foregroundColor(AppConstants.Colors.secondaryText)
                     }
                     
                     VStack(alignment: .leading, spacing: AppConstants.Spacing.sm) {
-                        Text("Privacy First")
+                        Text("Fast & Private")
                             .font(.headline)
                             .fontWeight(.semibold)
                             .foregroundColor(AppConstants.Colors.primaryText)
                         
-                        Text("QuickJournal is built with privacy by design. Your journal entries are stored locally on your device and encrypted using iOS Keychain services. We do not collect, store, or transmit your personal data.")
+                        Text("DayLog stores all your data locally on your device. Nothing is synced to the cloud or transmitted to servers. Optional encryption keeps your entries secure. The app is built for speed without compromising privacy.")
                             .foregroundColor(AppConstants.Colors.secondaryText)
                     }
                     

@@ -59,9 +59,41 @@ class JournalManager: ObservableObject {
         successFeedback.notificationOccurred(.success)
     }
     
+    /// Updates an existing journal entry
+    /// - Parameters:
+    ///   - entry: The entry to update (matched by ID)
+    ///   - content: The new content text
+    ///   - category: The new category (optional)
+    ///   - time: The new time string (optional)
+    func updateEntry(_ entry: JournalEntry, content: String, category: String?, time: String?) {
+        if let index = entries.firstIndex(where: { $0.id == entry.id }) {
+            // Create updated entry with the same ID, date, photo, and location preserved
+            let updatedEntry = JournalEntry(
+                content: content,
+                category: category,
+                date: entry.date,
+                time: time,
+                photoFilename: entry.photoFilename,
+                location: entry.location,
+                id: entry.id
+            )
+            entries[index] = updatedEntry
+            saveEntries()
+            
+            // Add haptic feedback for update
+            let successFeedback = UINotificationFeedbackGenerator()
+            successFeedback.notificationOccurred(.success)
+        }
+    }
+    
     /// Deletes a journal entry and updates the streak
     /// - Parameter entry: The journal entry to delete
     func deleteEntry(_ entry: JournalEntry) {
+        // Delete associated photo if exists
+        if let photoFilename = entry.photoFilename {
+            PhotoManager.shared.deletePhoto(filename: photoFilename)
+        }
+        
         entries.removeAll { $0.id == entry.id }
         saveEntries()
         updateStreak()
@@ -77,6 +109,79 @@ class JournalManager: ObservableObject {
     func getEntriesForDate(_ date: Date) -> [JournalEntry] {
         let calendar = Calendar.current
         return entries.filter { calendar.isDate($0.date, inSameDayAs: date) }
+    }
+    
+    /// Returns all entries for the current week
+    /// - Returns: Array of journal entries from start of week to now
+    func getEntriesForWeek() -> [JournalEntry] {
+        let calendar = Calendar.current
+        let today = Date()
+        guard let weekStart = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: today)) else {
+            return []
+        }
+        
+        return entries.filter { $0.date >= weekStart }
+            .sorted { $0.date < $1.date }
+    }
+    
+    /// Returns all entries for the current month
+    /// - Returns: Array of journal entries from start of month to now
+    func getEntriesForMonth() -> [JournalEntry] {
+        let calendar = Calendar.current
+        let today = Date()
+        guard let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: today)) else {
+            return []
+        }
+        
+        return entries.filter { $0.date >= monthStart }
+            .sorted { $0.date < $1.date }
+    }
+    
+    /// Returns all entries within a custom date range
+    /// - Parameters:
+    ///   - startDate: Start of the range
+    ///   - endDate: End of the range
+    /// - Returns: Array of journal entries within the range
+    func getEntriesInRange(from startDate: Date, to endDate: Date) -> [JournalEntry] {
+        let calendar = Calendar.current
+        let start = calendar.startOfDay(for: startDate)
+        let end = calendar.startOfDay(for: endDate).addingTimeInterval(86400) // End of day
+        
+        return entries.filter { $0.date >= start && $0.date < end }
+            .sorted { $0.date < $1.date }
+    }
+    
+    /// Formats entries for clipboard export in bullet-list format
+    /// - Parameter entries: Entries to format
+    /// - Returns: Formatted string ready for clipboard
+    func formatEntriesForClipboard(_ entries: [JournalEntry]) -> String {
+        guard !entries.isEmpty else { return "" }
+        
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: entries) { entry in
+            calendar.startOfDay(for: entry.date)
+        }
+        
+        let sortedDates = grouped.keys.sorted()
+        var output = ""
+        
+        for date in sortedDates {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MMM d"
+            let dateString = dateFormatter.string(from: date)
+            
+            output += "\(dateString):\n"
+            
+            if let dayEntries = grouped[date]?.sorted(by: { $0.date < $1.date }) {
+                for entry in dayEntries {
+                    output += "- \(entry.content)\n"
+                }
+            }
+            
+            output += "\n"
+        }
+        
+        return output.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     // MARK: - Private Methods

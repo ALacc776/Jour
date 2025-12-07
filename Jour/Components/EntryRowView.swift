@@ -8,17 +8,45 @@
 import SwiftUI
 
 /// Reusable view component for displaying individual journal entries in lists
-/// Shows entry content, category, time, and creation timestamp in a clean layout
+/// Shows entry content, category, time, photo, and location in a clean layout
 struct EntryRowView: View {
     // MARK: - Properties
     
     /// The journal entry to display
     let entry: JournalEntry
     
+    // MARK: - State
+    
+    /// Loaded photo thumbnail
+    @State private var thumbnail: UIImage?
+    
     // MARK: - Body
     
     var body: some View {
         VStack(alignment: .leading, spacing: AppConstants.Spacing.md) {
+            // MARK: - Photo (if available)
+            if let photoFilename = entry.photoFilename {
+                if let thumbnail = thumbnail {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 200)
+                        .clipShape(RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md))
+                } else {
+                    // Loading placeholder
+                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
+                        .fill(AppConstants.Colors.tertiaryBackground)
+                        .frame(height: 200)
+                        .overlay(
+                            ProgressView()
+                        )
+                        .onAppear {
+                            loadThumbnail(filename: photoFilename)
+                        }
+                }
+            }
+            
             // MARK: - Category Badge (if available)
             if let category = entry.category {
                 HStack {
@@ -65,5 +93,18 @@ struct EntryRowView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(entry.category ?? "Entry"): \(entry.content)")
         .accessibilityHint("Created at \(entry.date, style: .time)")
+    }
+    
+    // MARK: - Methods
+    
+    /// Loads the photo thumbnail
+    private func loadThumbnail(filename: String) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            if let image = PhotoManager.shared.loadThumbnail(filename: filename) {
+                DispatchQueue.main.async {
+                    self.thumbnail = image
+                }
+            }
+        }
     }
 }

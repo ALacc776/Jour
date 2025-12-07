@@ -1,34 +1,33 @@
-# QuickJournal - Privacy-First Journaling App
+# DayLog - Quick Daily Logging
 
-A professional, minimalist journaling app built with SwiftUI that prioritizes user privacy and data security.
+A fast, simple daily logging app built with SwiftUI. Log your day in seconds, not minutes.
 
 ## Features
 
 ### Core Functionality
-- **Journal Entries**: Create, edit, and organize daily journal entries
-- **Categories**: Predefined categories (Met with, Learned, Worked on, Went to, Finished, Felt)
-- **Multiple Entry Types**: 
-  - Categorized entries with optional time
-  - Free-form writing
-  - Quick entries (one line = one entry)
-- **Timeline View**: Chronological view of all entries
-- **Calendar View**: Browse entries by date
-- **Streak Tracking**: Track consecutive days of journaling
+- **Instant Input**: Open the app and start typing immediately - no buttons, no choices
+- **Quick-Add Buttons**: One-tap logging for common activities (Coffee, Workout, Read, Meal)
+- **Edit Entries**: Full editing support - fix typos, update content anytime
+- **Today View**: See all today's entries in one place
+- **Search**: Find any entry instantly by text content
+- **Calendar View**: Browse and add entries by date
+- **Streak Tracking**: Visual streak tracking with progress to milestones
 
-### Privacy & Security
-- **Local Storage**: All data stored locally on device
-- **Encryption**: Journal entries encrypted using iOS Keychain
-- **No Cloud Sync**: No data transmitted to external servers
+### Design Philosophy
+- **Speed First**: 5 seconds from open to saved entry
+- **Zero Friction**: No category selection required, no mode switching
+- **Auto-Save**: Type and go - entries save automatically
+- **Clean UI**: Minimal, focused interface
+- **Haptic Feedback**: Tactile confirmation for all actions
+
+### Additional Features
+- **Daily Reminders**: Customizable notification to maintain your streak
+- **Activity Heat Map**: GitHub-style visualization of your logging activity
+- **Enhanced Streak Display**: Motivational progress tracking with milestones
+- **Local Storage**: All data stays on your device
+- **Optional Encryption**: Toggle encryption for sensitive content
+- **Data Export**: Export entries in JSON or text format
 - **Privacy Policy**: Comprehensive privacy policy included
-- **Data Export**: Export entries in JSON, text, or CSV formats
-- **Data Deletion**: Complete data deletion functionality
-
-### Professional Design
-- **Minimalist UI**: Clean, professional interface
-- **Light Mode**: Optimized for professional environments
-- **Accessibility**: Full accessibility support
-- **Haptic Feedback**: Tactile feedback for interactions
-- **Smooth Animations**: Polished user experience
 
 ## App Store Requirements Compliance
 
@@ -62,18 +61,23 @@ A professional, minimalist journaling app built with SwiftUI that prioritizes us
 - [x] Unit tests included
 - [x] UI tests included
 
+## What Makes DayLog Different?
+
+Unlike traditional journal apps, DayLog is designed for **speed and simplicity**:
+
+- ❌ **No** complex entry forms
+- ❌ **No** mandatory categories  
+- ❌ **No** separate "create entry" button
+- ✅ **Just** open and type
+- ✅ **Auto-saves** as you go
+- ✅ **Quick-add** buttons for instant logging
+
+**Goal**: Log your day in 5 seconds or less.
+
 ## App Store Submission Checklist
 
-### Pre-Submission
-- [x] App icon (1024x1024 PNG, no transparency)
-- [x] Screenshots for all device sizes
-- [x] App description and keywords
-- [x] Privacy policy URL
-- [x] Support URL
-- [x] Marketing URL (optional)
-
 ### App Store Connect Setup
-- [x] App name: "QuickJournal"
+- [ ] App name: "DayLog"
 - [x] Bundle ID: `alacc776.Jour`
 - [x] Version: 1.0.0
 - [x] Category: Productivity
@@ -149,9 +153,8 @@ The app includes a comprehensive privacy policy that covers:
 ## Support
 
 For support and questions:
-- Email: support@quickjournal.app
-- Website: https://quickjournal.app
-- In-app support through Settings
+- Email: support@daylog.app (placeholder)
+- In-app support through Menu
 
 ## Development
 
@@ -177,12 +180,15 @@ For support and questions:
 
 ### Version 1.0.0
 - Initial release
-- Core journaling functionality
-- Privacy-first design
-- Professional UI
-- Data export/import
-- Streak tracking
-- Calendar and timeline views
+- Instant-input Today view
+- Quick-add buttons for one-tap logging
+- Full entry editing
+- Search functionality
+- Enhanced streak tracking with milestones
+- Activity heat map visualization
+- Daily reminder notifications
+- Calendar view
+- Local data storage with optional encryption
 
 ## License
 
@@ -192,9 +198,8 @@ This project is proprietary software. All rights reserved.
 
 For questions about this app or its development:
 - Developer: andapple
-- Email: support@quickjournal.app
-- Website: https://quickjournal.app
+- Email: support@daylog.app (placeholder)
 
 ---
 
-**Note**: This app is designed with privacy by design principles. Your journal entries remain private and are never transmitted to external servers.
+**Note**: DayLog is built for speed and simplicity. Your entries stay on your device and are never transmitted to external servers. The goal is to make daily logging so fast and easy that you actually do it every day.
