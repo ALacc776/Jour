@@ -75,6 +75,8 @@ struct QuickAddButton: View {
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
         }
+        .accessibilityLabel(label ?? "Quick add")
+        .accessibilityHint("Quickly adds a journal entry")
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)

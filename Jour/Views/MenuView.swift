@@ -22,8 +22,9 @@ struct MenuView: View {
     
     /// Controls various sheet presentations
     @State private var showingDataExport = false
-    @State private var showingAbout = false
+    @State private var showingDeleteWarning = false
     @State private var showingDeleteConfirmation = false
+    @State private var deleteConfirmationText = ""
     @State private var showingCustomRangeCopy = false
     @State private var showingPrivacyPolicy = false
     @State private var showingSupport = false
@@ -66,16 +67,8 @@ struct MenuView: View {
                     }
                 }
                 
-                // MARK: - App Info Section First
+                // MARK: - App Info Section
                 Section {
-                    // About
-                    Button(action: {
-                        showingAbout = true
-                    }) {
-                        Label("About DayLog", systemImage: "info.circle")
-                            .foregroundColor(AppConstants.Colors.primaryText)
-                    }
-                    
                     // Version
                     HStack {
                         Label("Version", systemImage: "app.badge")
@@ -153,16 +146,25 @@ struct MenuView: View {
                         Label("Export Data", systemImage: "square.and.arrow.up")
                             .foregroundColor(AppConstants.Colors.primaryText)
                     }
-                    
-                    // Delete all data
-                    Button(action: {
-                        showingDeleteConfirmation = true
-                    }) {
-                        Label("Delete All Data", systemImage: "trash")
-                            .foregroundColor(AppConstants.Colors.errorColor)
-                    }
                 } header: {
                     Text("Data Management")
+                }
+                
+                // MARK: - Danger Zone (Hidden)
+                Section {
+                    // Delete all data - requires double confirmation
+                    Button(action: {
+                        showingDeleteWarning = true
+                    }) {
+                        Label("Delete All Data", systemImage: "exclamationmark.triangle")
+                            .foregroundColor(AppConstants.Colors.errorColor)
+                            .font(.footnote)
+                    }
+                } header: {
+                    Text("Danger Zone")
+                } footer: {
+                    Text("⚠️ This will permanently delete all your journal entries. Export your data first!")
+                        .foregroundColor(AppConstants.Colors.errorColor)
                 }
             }
             .navigationTitle("Menu")
@@ -170,9 +172,6 @@ struct MenuView: View {
         }
         .sheet(isPresented: $showingDataExport) {
             DataExportView(journalManager: journalManager)
-        }
-        .sheet(isPresented: $showingAbout) {
-            AboutView()
         }
         .sheet(isPresented: $showingCustomRangeCopy) {
             CustomRangeCopyView(journalManager: journalManager)
@@ -183,13 +182,35 @@ struct MenuView: View {
         .sheet(isPresented: $showingSupport) {
             SupportView()
         }
-        .alert("Delete All Data", isPresented: $showingDeleteConfirmation) {
-            Button("Cancel", role: .cancel) { }
-            Button("Delete", role: .destructive) {
-                deleteAllData()
+        .alert("⚠️ Export First!", isPresented: $showingDeleteWarning) {
+            Button("Cancel", role: .cancel) {
+                deleteConfirmationText = ""
+            }
+            Button("I Exported My Data", role: .destructive) {
+                showingDeleteConfirmation = true
             }
         } message: {
-            Text("This will permanently delete all your journal entries and cannot be undone. Are you sure?")
+            Text("Have you exported your data? This action will delete ALL \(journalManager.entries.count) entries permanently!")
+        }
+        .alert("Type DELETE to Confirm", isPresented: $showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) {
+                deleteConfirmationText = ""
+            }
+            TextField("Type DELETE", text: $deleteConfirmationText)
+            Button("Delete Forever", role: .destructive) {
+                if deleteConfirmationText.uppercased() == "DELETE" {
+                    deleteAllData()
+                    deleteConfirmationText = ""
+                } else {
+                    // Wrong text, show error
+                    let errorFeedback = UINotificationFeedbackGenerator()
+                    errorFeedback.notificationOccurred(.error)
+                    showingDeleteConfirmation = false
+                    deleteConfirmationText = ""
+                }
+            }
+        } message: {
+            Text("This will permanently delete all \(journalManager.entries.count) journal entries. Type DELETE to confirm.")
         }
         .alert("Success", isPresented: $showingAlert) {
             Button("OK") { }

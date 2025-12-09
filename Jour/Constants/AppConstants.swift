@@ -19,11 +19,12 @@ enum AppConstants {
     // MARK: - Colors
     
     /// Professional minimalist color palette
+    /// ✨ Now supports dark mode automatically
     enum Colors {
-        // Background colors
-        static let primaryBackground = Color(red: 0.98, green: 0.98, blue: 0.99) // Light gray background
-        static let secondaryBackground = Color.white // Pure white for cards
-        static let tertiaryBackground = Color(red: 0.95, green: 0.95, blue: 0.96) // Subtle gray for sections
+        // Background colors (adapt to light/dark mode)
+        static let primaryBackground = Color(UIColor.systemGroupedBackground)
+        static let secondaryBackground = Color(UIColor.secondarySystemGroupedBackground)
+        static let tertiaryBackground = Color(UIColor.tertiarySystemGroupedBackground)
         
         // Primary gradient (subtle and professional)
         static let primaryGradient = [
@@ -52,22 +53,22 @@ enum AppConstants {
             Color(red: 0.9, green: 0.55, blue: 0.25)
         ]
         
-        // Text colors
-        static let primaryText = Color(red: 0.15, green: 0.15, blue: 0.2) // Dark gray for main text
-        static let secondaryText = Color(red: 0.5, green: 0.5, blue: 0.55) // Medium gray for secondary text
-        static let tertiaryText = Color(red: 0.7, green: 0.7, blue: 0.75) // Light gray for tertiary text
-        static let placeholderText = Color(red: 0.8, green: 0.8, blue: 0.85) // Very light gray for placeholders
+        // Text colors (adapt to light/dark mode)
+        static let primaryText = Color(UIColor.label)
+        static let secondaryText = Color(UIColor.secondaryLabel)
+        static let tertiaryText = Color(UIColor.tertiaryLabel)
+        static let placeholderText = Color(UIColor.placeholderText)
         static let accentText = Color(red: 0.95, green: 0.6, blue: 0.3) // Orange for highlights
         
-        // Card colors
-        static let cardBackground = Color.white
-        static let cardBorder = Color(red: 0.9, green: 0.9, blue: 0.92)
-        static let cardShadow = Color.black.opacity(0.05)
+        // Card colors (adapt to light/dark mode)
+        static let cardBackground = Color(UIColor.secondarySystemGroupedBackground)
+        static let cardBorder = Color(UIColor.separator)
+        static let cardShadow = Color(UIColor.systemGray).opacity(0.1)
         
-        // Status colors
-        static let successColor = Color(red: 0.2, green: 0.7, blue: 0.3)
-        static let warningColor = Color(red: 0.95, green: 0.6, blue: 0.3)
-        static let errorColor = Color(red: 0.9, green: 0.3, blue: 0.3)
+        // Status colors (adapt to light/dark mode)
+        static let successColor = Color(UIColor.systemGreen)
+        static let warningColor = Color(UIColor.systemOrange)
+        static let errorColor = Color(UIColor.systemRed)
     }
     
     // MARK: - Spacing

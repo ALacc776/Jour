@@ -76,6 +76,8 @@ struct TodayView: View {
                             .foregroundColor(AppConstants.Colors.primaryText)
                             .frame(width: 44, height: 44)
                     }
+                    .accessibilityLabel("Search entries")
+                    .accessibilityHint("Opens search to find journal entries")
                     
                     // Settings button
                     Button(action: {
@@ -86,6 +88,8 @@ struct TodayView: View {
                             .foregroundColor(AppConstants.Colors.primaryText)
                             .frame(width: 44, height: 44)
                     }
+                    .accessibilityLabel("Menu")
+                    .accessibilityHint("Opens settings and options menu")
                 }
                 .padding(.horizontal, AppConstants.Spacing.xl)
                 .padding(.top, AppConstants.Spacing.lg)
@@ -129,6 +133,8 @@ struct TodayView: View {
                                             .font(.title2)
                                             .foregroundColor(AppConstants.Colors.accentButton)
                                     }
+                                    .accessibilityLabel("Save entry")
+                                    .accessibilityHint("Saves your journal entry")
                                     .transition(.scale.combined(with: .opacity))
                                 }
                             }

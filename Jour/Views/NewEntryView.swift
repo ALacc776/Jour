@@ -236,7 +236,6 @@ struct NewEntryView: View {
         }
         .navigationTitle("Log Day")
         .navigationBarTitleDisplayMode(.inline)
-        .preferredColorScheme(.light)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button("Cancel") {

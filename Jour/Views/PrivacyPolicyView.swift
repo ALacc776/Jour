@@ -13,7 +13,7 @@ struct PrivacyPolicyView: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: AppConstants.Spacing.xl) {
                     // Last Updated

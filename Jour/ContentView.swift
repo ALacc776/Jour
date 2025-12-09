@@ -33,11 +33,10 @@ struct ContentView: View {
             CalendarView(journalManager: journalManager)
                 .tabItem {
                     Label("Calendar", systemImage: "calendar")
-                }
-                .tag(1)
-        }
-        .preferredColorScheme(.light)
-    }
+               }
+               .tag(1)
+       }
+   }
 }
 
 #Preview {

@@ -39,7 +39,7 @@ struct EnhancedStreakDisplay: View {
                     Image(systemName: streak.current > 0 ? "flame.fill" : "flame")
                         .foregroundColor(AppConstants.Colors.accentButton)
                         .font(.system(size: 32))
-                        .symbolEffect(.bounce, value: streak.current)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.6), value: streak.current)
                 }
                 
                 // Streak numbers
@@ -48,7 +48,7 @@ struct EnhancedStreakDisplay: View {
                         Text("\(streak.current)")
                             .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundColor(AppConstants.Colors.primaryText)
-                            .contentTransition(.numericText())
+                            .animation(.easeInOut, value: streak.current)
                         
                         Text("day\(streak.current == 1 ? "" : "s")")
                             .font(.headline)
