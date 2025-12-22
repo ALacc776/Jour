@@ -279,36 +279,31 @@ class JournalManager: ObservableObject {
     /// Decodes the stored JSON data back into the entries array
     /// Loads journal entries from UserDefaults with decryption
     /// Decodes the stored JSON data back into the entries array
+    /// Loads journal entries from UserDefaults with decryption
+    /// Decodes the stored JSON data back into the entries array
     private func loadEntries() {
         guard let data = userDefaults.data(forKey: entriesKey) else { return }
         
-        persistenceQueue.async { [weak self] in
-            guard let self = self else { return }
-            do {
-                var jsonData: Data
-                
-                // Try to decrypt first
-                if let decryptedText = self.privacyManager.decryptText(data),
-                   let decryptedData = decryptedText.data(using: .utf8) {
-                    jsonData = decryptedData
-                } else {
-                    // Fallback to unencrypted data
-                    jsonData = data
-                }
-                
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601
-                let decoded = try decoder.decode([JournalEntry].self, from: jsonData)
-                
-                DispatchQueue.main.async {
-                    self.entries = decoded
-                }
-            } catch {
-                print("Failed to load journal entries: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    self.entries = []
-                }
+        do {
+            var jsonData: Data
+            
+            // Try to decrypt first
+            if let decryptedText = self.privacyManager.decryptText(data),
+               let decryptedData = decryptedText.data(using: .utf8) {
+                jsonData = decryptedData
+            } else {
+                // Fallback to unencrypted data
+                jsonData = data
             }
+            
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            let decoded = try decoder.decode([JournalEntry].self, from: jsonData)
+            
+            self.entries = decoded
+        } catch {
+            print("Failed to load journal entries: \(error.localizedDescription)")
+            self.entries = []
         }
     }
     
