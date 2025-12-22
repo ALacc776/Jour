@@ -64,7 +64,7 @@ struct DataExportView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: AppConstants.Spacing.xl) {
                 // MARK: - Export Section
                 VStack(alignment: .leading, spacing: AppConstants.Spacing.lg) {

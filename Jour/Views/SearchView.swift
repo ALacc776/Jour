@@ -32,7 +32,7 @@ struct SearchView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // Search bar
                 HStack(spacing: AppConstants.Spacing.md) {

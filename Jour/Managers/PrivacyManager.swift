@@ -29,7 +29,7 @@ class PrivacyManager: ObservableObject {
     private let userDefaults = UserDefaults.standard
     
     /// Keychain service identifier
-    private let keychainService = "com.quickjournal.keychain"
+    private let keychainService = "com.daylog.keychain"
     
     /// Encryption key identifier
     private let encryptionKeyIdentifier = "journal_encryption_key"

@@ -69,6 +69,22 @@ enum AppConstants {
         static let successColor = Color(UIColor.systemGreen)
         static let warningColor = Color(UIColor.systemOrange)
         static let errorColor = Color(UIColor.systemRed)
+        
+        // MARK: - Playful Palette (Duolingo-inspired)
+        static let duoGreen = Color(red: 0.35, green: 0.8, blue: 0.1) // Vibrant green
+        static let duoGreenDark = Color(red: 0.25, green: 0.65, blue: 0.05) // Darker green for shadow
+        
+        static let duoBlue = Color(red: 0.1, green: 0.7, blue: 0.95) // Vibrant cyan/blue
+        static let duoBlueDark = Color(red: 0.0, green: 0.55, blue: 0.8) // Darker blue for shadow
+        
+        static let duoYellow = Color(red: 1.0, green: 0.8, blue: 0.1) // Vibrant yellow
+        static let duoYellowDark = Color(red: 0.9, green: 0.65, blue: 0.0) // Darker yellow for shadow
+        
+        static let duoPurple = Color(red: 0.6, green: 0.4, blue: 0.9) // Vibrant purple
+        static let duoPurpleDark = Color(red: 0.45, green: 0.3, blue: 0.75) // Darker purple for shadow
+        
+        static let duoRed = Color(red: 0.95, green: 0.3, blue: 0.35) // Vibrant red/pink
+        static let duoRedDark = Color(red: 0.8, green: 0.15, blue: 0.2) // Darker red for shadow
     }
     
     // MARK: - Spacing

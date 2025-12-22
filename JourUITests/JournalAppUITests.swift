@@ -7,7 +7,7 @@
 
 import XCTest
 
-/// UI tests for the QuickJournal app
+/// UI tests for the DayLog app
 /// Tests user interface interactions and workflows
 final class JournalAppUITests: XCTestCase {
     
@@ -156,12 +156,12 @@ final class JournalAppUITests: XCTestCase {
         // Navigate to Settings tab
         app.tabBars.buttons["Settings"].tap()
         
-        // Tap About QuickJournal
-        app.buttons["About QuickJournal"].tap()
+        // Tap About DayLog
+        app.buttons["About DayLog"].tap()
         
         // Verify about view is displayed
         XCTAssertTrue(app.navigationBars["About"].exists)
-        XCTAssertTrue(app.staticTexts["QuickJournal"].exists)
+        XCTAssertTrue(app.staticTexts["DayLog"].exists)
         XCTAssertTrue(app.staticTexts["Version 1.0.0"].exists)
         
         // Dismiss about view

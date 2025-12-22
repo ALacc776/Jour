@@ -33,7 +33,7 @@ struct CustomRangeCopyView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: AppConstants.Spacing.xl) {
                 // Instructions
                 Text("Select date range to copy")

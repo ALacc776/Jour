@@ -34,7 +34,7 @@ struct MenuView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 // MARK: - Reminders Section
                 Section {

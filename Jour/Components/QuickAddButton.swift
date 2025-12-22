@@ -18,6 +18,12 @@ struct QuickAddButton: View {
     /// Optional label text below the emoji
     let label: String?
     
+    /// Background color theme (light)
+    var color: Color = AppConstants.Colors.duoBlue
+    
+    /// Shadow color theme (dark)
+    var shadowColor: Color = AppConstants.Colors.duoBlueDark
+    
     /// Action to perform when tapped
     let action: () -> Void
     
@@ -32,10 +38,14 @@ struct QuickAddButton: View {
     /// - Parameters:
     ///   - emoji: The emoji to display
     ///   - label: Optional text label
+    ///   - color: Main background color (default: duoBlue)
+    ///   - shadowColor: Shadow/edge color (default: duoBlueDark)
     ///   - action: Action to perform on tap
-    init(emoji: String, label: String? = nil, action: @escaping () -> Void) {
+    init(emoji: String, label: String? = nil, color: Color = AppConstants.Colors.duoBlue, shadowColor: Color = AppConstants.Colors.duoBlueDark, action: @escaping () -> Void) {
         self.emoji = emoji
         self.label = label
+        self.color = color
+        self.shadowColor = shadowColor
         self.action = action
     }
     
@@ -44,45 +54,57 @@ struct QuickAddButton: View {
     var body: some View {
         Button(action: {
             // Add haptic feedback
-            let impactFeedback = UIImpactFeedbackGenerator(style: .light)
+            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
             impactFeedback.impactOccurred()
-            action()
+            
+            // Trigger animation
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                isPressed = true
+            }
+            
+            // Reset animation and perform action
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    isPressed = false
+                }
+                // Small delay to let the animation start before the action fires (if it changes view)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    action()
+                }
+            }
         }) {
             VStack(spacing: AppConstants.Spacing.xs) {
                 Text(emoji)
-                    .font(.title2)
+                    .font(.title) // Larger emoji
                 
                 if let label = label {
                     Text(label)
-                        .font(.caption2)
-                        .fontWeight(.medium)
-                        .foregroundColor(AppConstants.Colors.secondaryText)
+                        .font(.system(size: 14, weight: .bold, design: .rounded)) // Playful font
+                        .foregroundColor(.white)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
             }
-            .frame(minWidth: 60)
-            .padding(.vertical, AppConstants.Spacing.sm)
-            .padding(.horizontal, AppConstants.Spacing.md)
+            .frame(minWidth: 80, minHeight: 80)
+            .padding(AppConstants.Spacing.sm)
             .background(
-                RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
-                    .fill(AppConstants.Colors.secondaryBackground)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
-                            .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
-                    )
+                ZStack {
+                    // 3D Lip (Shadow) layer - Only visible at bottom to create depth
+                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.xl)
+                        .fill(shadowColor)
+                        .offset(y: isPressed ? 0 : 6) // Moves up when pressed
+                    
+                    // Main Face layer
+                    RoundedRectangle(cornerRadius: AppConstants.CornerRadius.xl)
+                        .fill(color)
+                        .offset(y: isPressed ? 6 : 0) // Moves down when pressed
+                }
             )
-            .scaleEffect(isPressed ? 0.95 : 1.0)
-            .animation(.spring(response: 0.2, dampingFraction: 0.6), value: isPressed)
         }
         .accessibilityLabel(label ?? "Quick add")
         .accessibilityHint("Quickly adds a journal entry")
         .buttonStyle(PlainButtonStyle())
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged { _ in isPressed = true }
-                .onEnded { _ in isPressed = false }
-        )
+        .scaleEffect(isPressed ? 0.95 : 1.0)
     }
 }
 

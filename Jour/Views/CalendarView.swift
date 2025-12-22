@@ -27,7 +27,7 @@ struct CalendarView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 // MARK: - Calendar Picker
                 VStack(spacing: AppConstants.Spacing.lg) {

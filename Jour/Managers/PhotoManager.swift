@@ -35,27 +35,42 @@ class PhotoManager {
         try? FileManager.default.createDirectory(at: photosDirectory, withIntermediateDirectories: true)
     }
     
+    /// Background queue for photo operations
+    private let photoQueue = DispatchQueue(label: "com.jour.photos", qos: .userInitiated)
+    
     // MARK: - Public Methods
     
-    /// Saves a photo and returns the filename
-    /// - Parameter image: The UIImage to save
-    /// - Returns: Filename of saved photo, or nil if save failed
-    func savePhoto(_ image: UIImage) -> String? {
-        // Generate unique filename
-        let filename = "\(UUID().uuidString).jpg"
-        let fileURL = photosDirectory.appendingPathComponent(filename)
-        
-        // Compress and save image
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            return nil
-        }
-        
-        do {
-            try imageData.write(to: fileURL)
-            return filename
-        } catch {
-            print("Failed to save photo: \(error.localizedDescription)")
-            return nil
+    /// Saves a photo asynchronously and returns the filename
+    /// - Parameters:
+    ///   - image: The UIImage to save
+    ///   - completion: Closure called with filename (or nil if failed)
+    func savePhoto(_ image: UIImage, completion: @escaping (String?) -> Void) {
+        photoQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Generate unique filename
+            let filename = "\(UUID().uuidString).jpg"
+            let fileURL = self.photosDirectory.appendingPathComponent(filename)
+            
+            // Compress and save image (heavy operation)
+            guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+                return
+            }
+            
+            do {
+                try imageData.write(to: fileURL)
+                DispatchQueue.main.async {
+                    completion(filename)
+                }
+            } catch {
+                print("Failed to save photo: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    completion(nil)
+                }
+            }
         }
     }
     

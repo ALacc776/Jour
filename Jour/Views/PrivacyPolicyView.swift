@@ -140,7 +140,7 @@ struct PrivacyPolicyView: View {
                         content: """
                         If you have questions about this privacy policy or DayLog, you can contact us:
                         
-                        Email: support@daylogapp.com
+                        Email: support.and@proton.me
                         
                         We typically respond within 48 hours.
                         """

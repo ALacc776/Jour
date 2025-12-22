@@ -48,7 +48,7 @@ struct EditEntryView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 ScrollView {
                     VStack(alignment: .leading, spacing: AppConstants.Spacing.xl) {
@@ -124,6 +124,24 @@ struct EditEntryView: View {
                         .padding(.horizontal, AppConstants.Spacing.xl)
                         
                         Spacer()
+                        
+                        // Delete Button
+                        Button(action: {
+                            showingDeleteConfirmation = true
+                        }) {
+                            HStack {
+                                Image(systemName: "trash")
+                                Text("Delete Entry")
+                            }
+                            .fontWeight(.medium)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.red.opacity(0.85)) // Slightly softer red
+                            .cornerRadius(AppConstants.CornerRadius.md)
+                        }
+                        .padding(.horizontal, AppConstants.Spacing.xl)
+                        .padding(.top, AppConstants.Spacing.lg)
                     }
                     .padding(.bottom, AppConstants.Spacing.xl)
                 }
@@ -157,10 +175,28 @@ struct EditEntryView: View {
                     .fontWeight(.semibold)
                 }
             }
+            .alert("Delete Entry?", isPresented: $showingDeleteConfirmation) {
+                Button("Delete", role: .destructive) {
+                    deleteEntry()
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("This cannot be undone. Are you sure?")
+            }
         }
     }
     
+    // MARK: - State (Confirmation)
+    
+    @State private var showingDeleteConfirmation = false
+    
     // MARK: - Methods
+    
+    /// Delete the entry
+    private func deleteEntry() {
+        journalManager.deleteEntry(entry)
+        dismiss()
+    }
     
     /// Saves the edited entry
     private func saveChanges() {

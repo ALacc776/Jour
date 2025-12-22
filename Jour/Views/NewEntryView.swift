@@ -37,10 +37,18 @@ struct NewEntryView: View {
     @State private var hasSelectedEntryType = false
     
     /// Optional specific date for the entry (if not provided, uses current date)
-    @State private var selectedDate: Date?
+    private let selectedDate: Date?
+    
+    /// Callback when view is dismissed
+    var onDismiss: (() -> Void)?
+    
+    @State private var showingDiscardAlert = false
+    
+    /// Trigger for confetti animation
+    @State private var confettiCounter = 0
     
     /// Focus state for the text editor
-    @FocusState private var isTextEditorFocused: Bool
+    @FocusState private var isInputFocused: Bool
     
     // MARK: - Initialization
     
@@ -74,21 +82,41 @@ struct NewEntryView: View {
                             .frame(height: 60)
                         
                         // Time periods - clean buttons
-                        VStack(spacing: 28) {
+                        VStack(spacing: 20) {
                             ForEach(TimePeriod.allCases, id: \.self) { period in
                                 Button(action: {
+                                    // Add haptic feedback
+                                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                    impactFeedback.impactOccurred()
                                     selectTimePeriod(period)
                                 }) {
                                     HStack(spacing: 16) {
                                         Text(period.emoji)
-                                            .font(.title2)
+                                            .font(.title)
                                         Text(period.rawValue)
-                                            .font(.body)
-                                            .foregroundColor(AppConstants.Colors.primaryText)
+                                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                                            .foregroundColor(.white)
                                         Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.headline)
+                                            .foregroundColor(.white.opacity(0.6))
                                     }
+                                    .padding()
+                                    .background(
+                                        ZStack {
+                                            // 3D Lip
+                                            RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                                .fill(AppConstants.Colors.duoBlueDark)
+                                                .offset(y: 6)
+                                            
+                                            // Face
+                                            RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                                .fill(AppConstants.Colors.duoBlue)
+                                        }
+                                    )
+                                    .padding(.bottom, 6) // Compensate for lip
                                 }
-                                .buttonStyle(PlainButtonStyle())
+                                .buttonStyle(PlayfulButtonStyle())
                             }
                         }
                         .padding(.horizontal, 40)
@@ -101,34 +129,74 @@ struct NewEntryView: View {
                             .padding(.vertical, 40)
                         
                         // Alternative entry options - clean buttons
-                        VStack(spacing: 28) {
+                        VStack(spacing: 20) {
                             Button(action: {
+                                // Add haptic feedback
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
                                 selectFreeForm()
                             }) {
                                 HStack(spacing: 16) {
                                     Text("📝")
-                                        .font(.title2)
+                                        .font(.title)
                                     Text("Free write")
-                                        .font(.body)
-                                        .foregroundColor(AppConstants.Colors.primaryText)
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
                                     Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.headline)
+                                        .foregroundColor(.white.opacity(0.6))
                                 }
+                                .padding()
+                                .background(
+                                    ZStack {
+                                        // 3D Lip
+                                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                            .fill(AppConstants.Colors.duoPurpleDark)
+                                            .offset(y: 6)
+                                        
+                                        // Face
+                                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                            .fill(AppConstants.Colors.duoPurple)
+                                    }
+                                )
+                                .padding(.bottom, 6)
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(PlayfulButtonStyle())
                             
                             Button(action: {
+                                // Add haptic feedback
+                                let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                                impactFeedback.impactOccurred()
                                 selectQuickEntry()
                             }) {
                                 HStack(spacing: 16) {
                                     Text("⚡")
-                                        .font(.title2)
+                                        .font(.title)
                                     Text("Quick entry")
-                                        .font(.body)
-                                        .foregroundColor(AppConstants.Colors.primaryText)
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
                                     Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.headline)
+                                        .foregroundColor(.white.opacity(0.6))
                                 }
+                                .padding()
+                                .background(
+                                    ZStack {
+                                        // 3D Lip
+                                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                            .fill(AppConstants.Colors.duoYellowDark)
+                                            .offset(y: 6)
+                                        
+                                        // Face
+                                        RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
+                                            .fill(AppConstants.Colors.duoYellow)
+                                    }
+                                )
+                                .padding(.bottom, 6)
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .buttonStyle(PlayfulButtonStyle())
                         }
                         .padding(.horizontal, 40)
                         
@@ -185,7 +253,7 @@ struct NewEntryView: View {
                                 TextEditor(text: $entryText)
                                     .padding(AppConstants.Spacing.lg)
                                     .font(.body)
-                                    .focused($isTextEditorFocused)
+                                    .focused($isInputFocused)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: AppConstants.CornerRadius.md)
                                             .stroke(AppConstants.Colors.cardBorder, lineWidth: 1)
@@ -204,7 +272,7 @@ struct NewEntryView: View {
                                     .onAppear {
                                         // Auto-focus when text editor appears
                                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                            isTextEditorFocused = true
+                                            isInputFocused = true
                                         }
                                     }
                                 
@@ -221,8 +289,8 @@ struct NewEntryView: View {
                                             .foregroundColor(AppConstants.Colors.placeholderText)
                                             .font(.body)
                                     }
-                                    .padding(.horizontal, AppConstants.Spacing.lg)
-                                    .padding(.vertical, AppConstants.Spacing.md)
+                                    .padding(.leading, AppConstants.Spacing.lg + 5)
+                                    .padding(.top, AppConstants.Spacing.lg + 8)
                                     .allowsHitTesting(false)
                                 }
                             }
@@ -383,6 +451,15 @@ struct NewEntryView: View {
             journalManager.saveEntry(entry)
         }
         
-        dismiss()
+        // Trigger confetti then close
+        confettiCounter += 1
+        // returnToPrevious() // No delay needed, confetti is on top, but maybe a slight delay to see it before sheet closes? 
+        // Actually, since the sheet closes, the confetti might disappear.
+        // Good point. It's better to trigger confetti on the PARENT view or delay dismissal.
+        // For now, let's delay dismissal slightly.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            onDismiss?()
+            dismiss()
+        }
     }
 }

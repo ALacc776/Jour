@@ -18,7 +18,7 @@ struct TimelineView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 0) {
                 if journalManager.entries.isEmpty {
                     // MARK: - Empty State

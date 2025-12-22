@@ -27,6 +27,8 @@ class JournalManager: ObservableObject {
     /// Privacy manager for encryption and privacy controls
     private let privacyManager = PrivacyManager()
     
+    /// Background queue for persistence operations to prevent UI freezing
+    private let persistenceQueue = DispatchQueue(label: "com.jour.persistence", qos: .background)    
     // MARK: - Constants
     
     /// Key for storing journal entries in UserDefaults
@@ -109,6 +111,13 @@ class JournalManager: ObservableObject {
     func getEntriesForDate(_ date: Date) -> [JournalEntry] {
         let calendar = Calendar.current
         return entries.filter { calendar.isDate($0.date, inSameDayAs: date) }
+    }
+    
+    /// Checks if there is any entry for a specific date
+    /// - Parameter date: The date to check
+    /// - Returns: True if an entry exists, false otherwise
+    func hasEntry(on date: Date) -> Bool {
+        !getEntriesForDate(date).isEmpty
     }
     
     /// Returns all entries for the current week
@@ -240,49 +249,66 @@ class JournalManager: ObservableObject {
     
     /// Saves journal entries to UserDefaults with encryption
     /// Encodes the entries array to JSON and stores it persistently
+    /// Saves journal entries to UserDefaults with encryption
+    /// Encodes the entries array to JSON and stores it persistently
     func saveEntries() {
-        do {
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            let encoded = try encoder.encode(entries)
-            
-            // Encrypt the data if privacy manager is enabled
-            if let encryptedData = privacyManager.encryptText(String(data: encoded, encoding: .utf8) ?? "") {
-                userDefaults.set(encryptedData, forKey: entriesKey)
-            } else {
-                // Fallback to unencrypted storage
-                userDefaults.set(encoded, forKey: entriesKey)
+        // Create a snapshot of entries to save
+        let entriesSnapshot = entries
+        
+        persistenceQueue.async { [weak self] in
+            guard let self = self else { return }
+            do {
+                let encoder = JSONEncoder()
+                encoder.dateEncodingStrategy = .iso8601
+                let encoded = try encoder.encode(entriesSnapshot)
+                
+                // Encrypt the data if privacy manager is enabled
+                if let encryptedData = self.privacyManager.encryptText(String(data: encoded, encoding: .utf8) ?? "") {
+                    self.userDefaults.set(encryptedData, forKey: self.entriesKey)
+                } else {
+                    // Fallback to unencrypted storage
+                    self.userDefaults.set(encoded, forKey: self.entriesKey)
+                }
+            } catch {
+                print("Failed to save journal entries: \(error.localizedDescription)")
             }
-        } catch {
-            print("Failed to save journal entries: \(error.localizedDescription)")
         }
     }
     
     /// Loads journal entries from UserDefaults with decryption
     /// Decodes the stored JSON data back into the entries array
+    /// Loads journal entries from UserDefaults with decryption
+    /// Decodes the stored JSON data back into the entries array
     private func loadEntries() {
         guard let data = userDefaults.data(forKey: entriesKey) else { return }
         
-        do {
-            var jsonData: Data
-            
-            // Try to decrypt first
-            if let decryptedText = privacyManager.decryptText(data),
-               let decryptedData = decryptedText.data(using: .utf8) {
-                jsonData = decryptedData
-            } else {
-                // Fallback to unencrypted data
-                jsonData = data
+        persistenceQueue.async { [weak self] in
+            guard let self = self else { return }
+            do {
+                var jsonData: Data
+                
+                // Try to decrypt first
+                if let decryptedText = self.privacyManager.decryptText(data),
+                   let decryptedData = decryptedText.data(using: .utf8) {
+                    jsonData = decryptedData
+                } else {
+                    // Fallback to unencrypted data
+                    jsonData = data
+                }
+                
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .iso8601
+                let decoded = try decoder.decode([JournalEntry].self, from: jsonData)
+                
+                DispatchQueue.main.async {
+                    self.entries = decoded
+                }
+            } catch {
+                print("Failed to load journal entries: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.entries = []
+                }
             }
-            
-            let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            let decoded = try decoder.decode([JournalEntry].self, from: jsonData)
-            entries = decoded
-        } catch {
-            print("Failed to load journal entries: \(error.localizedDescription)")
-            // If loading fails, start with empty array
-            entries = []
         }
     }
     

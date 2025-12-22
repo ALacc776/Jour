@@ -76,7 +76,7 @@ struct SupportView: View {
                         
                         // Email Button
                         Button(action: {
-                            if let url = URL(string: "mailto:support@daylogapp.com?subject=DayLog%20Support") {
+                            if let url = URL(string: "mailto:support.and@proton.me?subject=DayLog%20Support") {
                                 UIApplication.shared.open(url)
                             }
                         }) {
@@ -92,7 +92,7 @@ struct SupportView: View {
                         }
                         .padding(.horizontal, AppConstants.Spacing.xl)
                         
-                        Text("support@daylogapp.com")
+                        Text("support.and@proton.me")
                             .font(.caption)
                             .foregroundColor(AppConstants.Colors.secondaryText)
                         
