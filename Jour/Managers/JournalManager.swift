@@ -19,6 +19,9 @@ class JournalManager: ObservableObject {
     /// Current streak information including current and longest streaks
     @Published var streak: JournalStreak = JournalStreak()
     
+    /// Loading state for initial data fetch
+    @Published var isLoading = true
+    
     // MARK: - Private Properties
     
     /// UserDefaults instance for data persistence
@@ -41,9 +44,20 @@ class JournalManager: ObservableObject {
     
     /// Initializes the JournalManager and loads existing data
     init() {
-        loadEntries()
-        loadStreak()
-        updateStreak()
+        // Load data asynchronously to prevent blocking app launch
+        persistenceQueue.async { [weak self] in
+            guard let self = self else { return }
+            
+            // Core data load
+            self.loadEntries()
+            self.loadStreak()
+            
+            // Update UI on main thread
+            DispatchQueue.main.async {
+                self.updateStreak()
+                self.isLoading = false
+            }
+        }
     }
     
     // MARK: - Public Methods
@@ -183,7 +197,12 @@ class JournalManager: ObservableObject {
             
             if let dayEntries = grouped[date]?.sorted(by: { $0.date < $1.date }) {
                 for entry in dayEntries {
-                    output += "- \(entry.content)\n"
+                    let text = entry.content.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if text.isEmpty, entry.photoFilename != nil {
+                        output += "- 📷 [Photo]\n"
+                    } else {
+                        output += "- \(entry.content)\n"
+                    }
                 }
             }
             
@@ -231,7 +250,15 @@ class JournalManager: ObservableObject {
             streak.lastEntryDate = formatDate(today)
         } else if hasEntryYesterday {
             // If no entry today but had entry yesterday, streak continues
-            streak.current = max(1, streak.current)
+            // Recalculate to ensure accuracy (don't rely on cache)
+            var currentStreak = 0
+            var checkDate = yesterday
+            
+            while entryDates.contains(checkDate) {
+                currentStreak += 1
+                checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+            }
+            streak.current = currentStreak
         } else {
             // No entry today or yesterday, streak resets
             streak.current = 0
@@ -300,10 +327,14 @@ class JournalManager: ObservableObject {
             decoder.dateDecodingStrategy = .iso8601
             let decoded = try decoder.decode([JournalEntry].self, from: jsonData)
             
-            self.entries = decoded
+            DispatchQueue.main.async {
+                self.entries = decoded
+            }
         } catch {
             print("Failed to load journal entries: \(error.localizedDescription)")
-            self.entries = []
+            DispatchQueue.main.async {
+                self.entries = []
+            }
         }
     }
     
@@ -325,7 +356,9 @@ class JournalManager: ObservableObject {
         
         do {
             let decoded = try JSONDecoder().decode(JournalStreak.self, from: data)
-            streak = decoded
+            DispatchQueue.main.async {
+                self.streak = decoded
+            }
         } catch {
             print("Failed to load streak data: \(error.localizedDescription)")
         }

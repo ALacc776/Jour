@@ -69,8 +69,8 @@ class NotificationManager: ObservableObject {
         
         // Create notification content
         let content = UNMutableNotificationContent()
-        content.title = "Time to log your day"
-        content.body = "Take a moment to reflect on what you did today"
+        content.title = "Don't break your streak! 🔥"
+        content.body = "You haven't logged your day yet. Take a moment to capture it."
         content.sound = .default
         content.badge = 1
         

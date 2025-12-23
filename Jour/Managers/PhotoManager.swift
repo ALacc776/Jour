@@ -24,6 +24,9 @@ class PhotoManager {
     /// Maximum thumbnail size
     private let thumbnailSize = CGSize(width: 300, height: 300)
     
+    /// Cache for thumbnails to improve performance
+    private let imageCache = NSCache<NSString, UIImage>()
+    
     // MARK: - Initialization
     
     private init() {
@@ -33,6 +36,9 @@ class PhotoManager {
         
         // Create directory if it doesn't exist
         try? FileManager.default.createDirectory(at: photosDirectory, withIntermediateDirectories: true)
+        
+        // Configure cache limits (optional but good practice)
+        imageCache.countLimit = 100 // Cache up to 100 thumbnails
     }
     
     /// Background queue for photo operations
@@ -62,6 +68,10 @@ class PhotoManager {
             
             do {
                 try imageData.write(to: fileURL)
+                
+                // Cache the full image as thumbnail (or resize and cache) to make it instantly available
+                // For now, let's just clear cache for this file to be safe, or cache explicitly if we reasoned
+                
                 DispatchQueue.main.async {
                     completion(filename)
                 }
@@ -92,11 +102,22 @@ class PhotoManager {
     /// - Parameter filename: The filename to load
     /// - Returns: Resized UIImage if found, nil otherwise
     func loadThumbnail(filename: String) -> UIImage? {
+        // Check cache first
+        if let cachedImage = imageCache.object(forKey: filename as NSString) {
+            return cachedImage
+        }
+        
+        // Load and resize
         guard let fullImage = loadPhoto(filename: filename) else {
             return nil
         }
         
-        return fullImage.resized(to: thumbnailSize)
+        let thumbnail = fullImage.resized(to: thumbnailSize)
+        
+        // Cache the result
+        imageCache.setObject(thumbnail, forKey: filename as NSString)
+        
+        return thumbnail
     }
     
     /// Deletes a photo file

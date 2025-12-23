@@ -92,7 +92,7 @@ struct CalendarView: View {
                         }
                         .padding(.horizontal, AppConstants.Spacing.xl)
                         
-                        if entriesForSelectedDate.isEmpty {
+                if entriesForSelectedDate.isEmpty {
                             // MARK: - Empty State for Selected Date
                             VStack(spacing: AppConstants.Spacing.lg) {
                                 Image(systemName: "calendar.badge.plus")
@@ -108,15 +108,38 @@ struct CalendarView: View {
                             .padding(.vertical, AppConstants.Spacing.xxxxl)
                         } else {
                             // MARK: - List of Entries
-                            ScrollView {
-                                LazyVStack(spacing: AppConstants.Spacing.md) {
-                                    ForEach(entriesForSelectedDate) { entry in
-                                        EntryRowView(entry: entry)
-                                    }
+                            List {
+                                ForEach(entriesForSelectedDate) { entry in
+                                    EntryRowView(entry: entry)
+                                        .onTapGesture {
+                                            editingEntry = entry
+                                        }
+                                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                            Button(role: .destructive) {
+                                                entryToDelete = entry
+                                                showingDeleteConfirmation = true
+                                            } label: {
+                                                Label("Delete", systemImage: "trash")
+                                            }
+                                        }
+                                        .swipeActions(edge: .leading, allowsFullSwipe: false) {
+                                            Button {
+                                                editingEntry = entry
+                                            } label: {
+                                                Label("Edit", systemImage: "pencil")
+                                            }
+                                            .tint(AppConstants.Colors.accentButton)
+                                        }
+                                        .listRowInsets(EdgeInsets())
+                                        .listRowSeparator(.hidden)
+                                        .listRowBackground(Color.clear)
                                 }
-                                .padding(.horizontal, AppConstants.Spacing.xl)
-                                .padding(.bottom, AppConstants.Spacing.xl)
+                                .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20)) // Match AppConstants.Spacing.xl
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
                             }
+                            .listStyle(.plain)
+                            .scrollContentBackground(.hidden)
                         }
                     }
                 }
@@ -129,10 +152,32 @@ struct CalendarView: View {
             .sheet(isPresented: $showingEntryModal) {
                 NewEntryView(journalManager: journalManager, selectedDate: selectedDate)
             }
+            .sheet(item: $editingEntry) { entry in
+                EditEntryView(journalManager: journalManager, entry: entry)
+            }
             .alert("Copied to Clipboard", isPresented: $showingCopyAlert) {
                 Button("OK") { }
             } message: {
                 Text("Entries for \(formatDateShort(selectedDate)) copied to clipboard")
+            }
+            .confirmationDialog(
+                "Delete this entry?",
+                isPresented: $showingDeleteConfirmation,
+                titleVisibility: .visible
+            ) {
+                Button("Delete", role: .destructive) {
+                    if let entry = entryToDelete {
+                        withAnimation(.spring()) {
+                            journalManager.deleteEntry(entry)
+                        }
+                    }
+                    entryToDelete = nil
+                }
+                Button("Cancel", role: .cancel) {
+                    entryToDelete = nil
+                }
+            } message: {
+                Text("This action cannot be undone.")
             }
         }
     }
@@ -143,6 +188,11 @@ struct CalendarView: View {
     private var entriesForSelectedDate: [JournalEntry] {
         journalManager.getEntriesForDate(selectedDate)
     }
+    
+    // MARK: - State Properties
+    @State private var editingEntry: JournalEntry?
+    @State private var entryToDelete: JournalEntry?
+    @State private var showingDeleteConfirmation = false
     
     // MARK: - Private Methods
     

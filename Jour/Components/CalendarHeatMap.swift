@@ -256,75 +256,181 @@ struct CalendarMonthGrid: View {
 struct YearlyHeatMapView: View {
     let counts: [Date: Int]
     
-    // 7 Rows fixed
-    private let rows = Array(repeating: GridItem(.fixed(10), spacing: 3), count: 7)
+    // Grid State
+    @State private var weeks: [WeekData] = []
     
     var body: some View {
-        // Use spacing: 0 to eliminate gap between axes and grid
-        HStack(alignment: .bottom, spacing: 0) {
-            // Day Labels (Left)
-            VStack(alignment: .leading, spacing: 3) {
-                // 10pt height + 3 pt spacing matching grid
-                ForEach(0..<7, id: \.self) { row in
-                    if [1, 3, 5].contains(row) {
-                        Text(dayLabel(row))
-                            .font(.system(size: 9, weight: .medium))
-                            .foregroundColor(AppConstants.Colors.tertiaryText)
-                            .frame(height: 10)
-                    } else {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .bottom, spacing: 3) {
+                    
+                    // Day Labels Column (Left Axis)
+                    VStack(alignment: .leading, spacing: 3) {
+                        // Spacer for Month Label Header height (10pt font)
                         Color.clear.frame(height: 10)
+                        
+                        // Spacer for spacing between header and grid (4pt)
+                        Color.clear.frame(height: 4)
+                        
+                        // Days
+                        ForEach(0..<7, id: \.self) { row in
+                            if [1, 3, 5].contains(row) {
+                                Text(dayLabel(row))
+                                    .font(.system(size: 9, weight: .medium))
+                                    .foregroundColor(AppConstants.Colors.tertiaryText)
+                                    .frame(height: 10)
+                            } else {
+                                Color.clear.frame(height: 10)
+                            }
+                        }
                     }
-                }
-            }
-            .frame(width: 25, alignment: .leading) // Fixed width for labels column
-            .padding(.bottom, 2)
-            .padding(.trailing, 2) // Tiny buffer
-            
-            // Scrollable Content (Months + Grid)
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        // Month Labels
-                        HStack(alignment: .bottom, spacing: 3) {
-                            ForEach(generateWeeks(), id: \.self) { weekStart in
-                                if isStartOfMonth(weekStart) {
-                                    Text(monthLabel(weekStart))
-                                        .font(.system(size: 10, weight: .medium))
-                                        .foregroundColor(AppConstants.Colors.tertiaryText)
-                                        .fixedSize()
-                                        .frame(alignment: .leading)
-                                } else {
-                                    Color.clear.frame(width: 10)
+                    .padding(.bottom, 2)
+                    .padding(.trailing, 4)
+                    
+                    // Weeks Columns
+                    LazyHStack(alignment: .bottom, spacing: 3) {
+                        ForEach(weeks) { week in
+                            VStack(alignment: .leading, spacing: 4) {
+                                // Month Label
+                                // Use overlay to prevent text width from expanding the column width
+                                Color.clear
+                                    .frame(width: 10, height: 10)
+                                    .overlay(alignment: .bottomLeading) {
+                                        if week.isStartOfMonth {
+                                            Text(week.monthLabel)
+                                                .font(.system(size: 10, weight: .bold))
+                                                .foregroundColor(AppConstants.Colors.tertiaryText)
+                                                .fixedSize() // Allow text to overflow 10pt width visually
+                                                .background(AppConstants.Colors.primaryBackground.opacity(0.8)) // Optional legibility
+                                        }
+                                    }
+                                
+                                // Days Grid Column
+                                VStack(spacing: 3) {
+                                    ForEach(week.days, id: \.self) { date in
+                                        if let date = date {
+                                            let count = counts[Calendar.current.startOfDay(for: date)] ?? 0
+                                            RoundedRectangle(cornerRadius: 2)
+                                                .fill(colorForCount(count))
+                                                .frame(width: 10, height: 10)
+                                        } else {
+                                            Color.clear.frame(width: 10, height: 10)
+                                        }
+                                    }
                                 }
                             }
-                        }
-                        
-                        // Heatmap Grid
-                        LazyHGrid(rows: rows, spacing: 3) {
-                            ForEach(generateYearDates(), id: \.self) { date in
-                                let count = counts[Calendar.current.startOfDay(for: date)] ?? 0
-                                RoundedRectangle(cornerRadius: 2)
-                                    .fill(colorForCount(count))
-                                    .frame(width: 10, height: 10)
-                                    .id(date) // For scrolling
-                            }
+                            .id(week.id) // Identify for scrolling
                         }
                     }
-                    .padding(.trailing, 20) // Some buffer at the end
+                    .padding(.trailing, 20)
                 }
-                .onAppear {
-                    // Scroll to today (or end of list)
-                    // We can scroll to the last date or today.
-                    // generateYearDates() ends at today.
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        if let lastDate = generateYearDates().last {
-                             proxy.scrollTo(lastDate, anchor: .trailing)
-                        }
+            .onAppear {
+                generateWeeks()
+                
+                // Scroll to end after layout
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    if let lastWeek = weeks.last {
+                        proxy.scrollTo(lastWeek.id, anchor: .trailing)
                     }
                 }
             }
         }
         .frame(height: 130)
+        // Fade mask on the left to show "history"
+        .overlay(
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    AppConstants.Colors.cardBackground,
+                    AppConstants.Colors.cardBackground.opacity(0.0)
+                ]),
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+            .frame(width: 30)
+            .allowsHitTesting(false), // Allow touches through
+            alignment: .leading
+        )
+    }
+    }
+    
+    // MARK: - Data Generation
+    
+    private func generateWeeks() {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        // Go back 52 weeks
+        guard let oneYearAgo = calendar.date(byAdding: .weekOfYear, value: -52, to: today) else { return }
+        
+        // Find start of that week (Sunday)
+        let weekday = calendar.component(.weekday, from: oneYearAgo)
+        guard let startSunday = calendar.date(byAdding: .day, value: -(weekday - 1), to: oneYearAgo) else { return }
+        
+        var newWeeks: [WeekData] = []
+        
+        for i in 0...52 {
+            guard let weekStart = calendar.date(byAdding: .weekOfYear, value: i, to: startSunday) else { continue }
+            
+            var days: [Date?] = []
+            // Collect 7 days
+            for d in 0..<7 {
+                if let date = calendar.date(byAdding: .day, value: d, to: weekStart) {
+                    // Only add if not in future (optional, but requested "whole year" usually implies past year)
+                    if date > today {
+                        days.append(nil) // Future placeholder if we want to stop exactly at today
+                    } else {
+                        days.append(date)
+                    }
+                } else {
+                    days.append(nil)
+                }
+            }
+            
+            // Determine Month Label
+            // Rule: Show label if this week contains the 1st of the month
+            let monthLabel = getMonthLabel(for: weekStart)
+            let isStart = monthLabel != nil
+            
+            newWeeks.append(WeekData(id: i, days: days, isStartOfMonth: isStart, monthLabel: monthLabel ?? ""))
+        }
+        
+        self.weeks = newWeeks
+    }
+    
+    private func getMonthLabel(for weekStart: Date) -> String? {
+        let calendar = Calendar.current
+        // Check all days in this week
+        for i in 0..<7 {
+            if let date = calendar.date(byAdding: .day, value: i, to: weekStart) {
+                if calendar.component(.day, from: date) <= 7 && i == 0 { 
+                    // To be simple: if the week STARTS within the first 7 days, we can label it?
+                    // Actually better rule: specific logic to align perfectly.
+                    // If the 1st of the month IS in this week?
+                    let day = calendar.component(.day, from: date)
+                    if day == 1 {
+                        let formatter = DateFormatter()
+                        formatter.dateFormat = "MMM"
+                        return formatter.string(from: date)
+                    }
+                }
+            }
+        }
+        
+        // Fallback: If 1st wasn't processed (maybe start of chart?), check purely based on week start?
+        // Let's use a simpler heuristic: If the week start is the first week of the month encountered.
+        // Actually, looking at GitHub, the label appears above the week that contains Day 1.
+        
+        for i in 0..<7 {
+             if let date = calendar.date(byAdding: .day, value: i, to: weekStart) {
+                 if calendar.component(.day, from: date) == 1 {
+                     let formatter = DateFormatter()
+                     formatter.dateFormat = "MMM"
+                     return formatter.string(from: date)
+                 }
+             }
+        }
+        
+        return nil
     }
     
     // MARK: - Helpers
@@ -338,61 +444,21 @@ struct YearlyHeatMapView: View {
         }
     }
     
-    private func monthLabel(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM"
-        return formatter.string(from: date)
-    }
-    
-    private func isStartOfMonth(_ date: Date) -> Bool {
-        let calendar = Calendar.current
-        let day = calendar.component(.day, from: date)
-        return day <= 7
-    }
-    
-    private func generateWeeks() -> [Date] {
-        let calendar = Calendar.current
-        let today = Date()
-        guard let startDate = calendar.date(byAdding: .weekOfYear, value: -52, to: today) else { return [] }
-        
-        let weekday = calendar.component(.weekday, from: startDate)
-        guard let startSunday = calendar.date(byAdding: .day, value: -(weekday - 1), to: startDate) else { return [] }
-        
-        var weeks: [Date] = []
-        for i in 0..<53 {
-            if let date = calendar.date(byAdding: .weekOfYear, value: i, to: startSunday) {
-                weeks.append(date)
-            }
-        }
-        return weeks
-    }
-    
-    private func generateYearDates() -> [Date] {
-        let calendar = Calendar.current
-        let today = Date()
-        guard let startDate = calendar.date(byAdding: .weekOfYear, value: -52, to: today) else { return [] }
-        
-        let weekday = calendar.component(.weekday, from: startDate)
-        guard let startSunday = calendar.date(byAdding: .day, value: -(weekday - 1), to: startDate) else { return [] }
-        
-        var dates: [Date] = []
-        for i in 0..<(53*7) {
-            if let date = calendar.date(byAdding: .day, value: i, to: startSunday) {
-                dates.append(date)
-            }
-        }
-        return dates
-    }
-    
     private func colorForCount(_ count: Int) -> Color {
-        // GitHub style: 0 is Color(uiColor: .systemGray6)
-        // Levels are shades of green
-        if count == 0 { return Color(uiColor: .systemGray5) }
+        if count == 0 { return Color(uiColor: .systemGray6) }
         switch count {
         case 1: return AppConstants.Colors.duoGreen.opacity(0.4)
         case 2: return AppConstants.Colors.duoGreen.opacity(0.7)
         default: return AppConstants.Colors.duoGreen
         }
     }
+}
+
+/// Helper struct for column-based layout
+struct WeekData: Identifiable {
+    let id: Int
+    let days: [Date?] // 7 days (can be nil if out of bounds)
+    let isStartOfMonth: Bool
+    let monthLabel: String
 }
 

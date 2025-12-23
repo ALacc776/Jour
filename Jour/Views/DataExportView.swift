@@ -22,9 +22,6 @@ struct DataExportView: View {
     /// Controls the presentation of the document picker for import
     @State private var showingDocumentPicker = false
     
-    /// Controls the presentation of the share sheet for export
-    @State private var showingShareSheet = false
-    
     /// Controls the presentation of alerts
     @State private var showingAlert = false
     @State private var alertMessage = ""
@@ -32,9 +29,6 @@ struct DataExportView: View {
     
     /// Selected export format
     @State private var selectedExportFormat: ExportFormat = .json
-    
-    /// Export file URL to share
-    @State private var exportFileURL: URL?
     
     // MARK: - Export Formats
     
@@ -60,6 +54,9 @@ struct DataExportView: View {
             }
         }
     }
+    
+    /// Controls the presentation of the share sheet
+    @State private var showingShareSheet = false
     
     // MARK: - Body
     
@@ -93,22 +90,39 @@ struct DataExportView: View {
                     }
                     
                     // Export Button
-                    Button(action: {
-                        performExport()
-                    }) {
-                        HStack {
-                            Image(systemName: "square.and.arrow.up")
-                                .font(.headline)
-                            Text("Export \(journalManager.entries.count) Entries")
-                                .font(.headline)
-                                .fontWeight(.semibold)
+                    if let _ = exportURL { // Check if URL is ready
+                        Button(action: {
+                            showingShareSheet = true
+                        }) {
+                            HStack {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.headline)
+                                Text("Export \(journalManager.entries.count) Entries")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, AppConstants.Spacing.lg)
+                            .primaryButtonStyle()
                         }
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, AppConstants.Spacing.lg)
-                        .primaryButtonStyle()
+                    } else {
+                        // Loading state
+                        Button(action: {}) {
+                            HStack {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                Text("Preparing...")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, AppConstants.Spacing.lg)
+                            .primaryButtonStyle()
+                        }
+                        .disabled(true)
                     }
-                    .disabled(journalManager.entries.isEmpty)
                 }
                 .padding(AppConstants.Spacing.xl)
                 .background(AppConstants.Colors.secondaryBackground)
@@ -168,6 +182,7 @@ struct DataExportView: View {
                     HStack {
                         Text("Total Entries:")
                             .foregroundColor(AppConstants.Colors.secondaryText)
+                            .accessibilityLabel("Total Entries Count")
                         Spacer()
                         Text("\(journalManager.entries.count)")
                             .fontWeight(.semibold)
@@ -177,6 +192,7 @@ struct DataExportView: View {
                     HStack {
                         Text("Current Streak:")
                             .foregroundColor(AppConstants.Colors.secondaryText)
+                            .accessibilityLabel("Current Streak Count")
                         Spacer()
                         Text("\(journalManager.streak.current) days")
                             .fontWeight(.semibold)
@@ -186,6 +202,7 @@ struct DataExportView: View {
                     HStack {
                         Text("Best Streak:")
                             .foregroundColor(AppConstants.Colors.secondaryText)
+                            .accessibilityLabel("Best Streak Count")
                         Spacer()
                         Text("\(journalManager.streak.longest) days")
                             .fontWeight(.semibold)
@@ -216,6 +233,12 @@ struct DataExportView: View {
                 }
             }
         }
+        .onAppear {
+            generateExportFile()
+        }
+        .onChange(of: selectedExportFormat) { _ in
+            generateExportFile()
+        }
         .sheet(isPresented: $showingDocumentPicker) {
             DocumentPicker(
                 allowedContentTypes: [.json, .plainText, .commaSeparatedText],
@@ -224,9 +247,10 @@ struct DataExportView: View {
                 }
             )
         }
+        // Share Sheet Presentation
         .sheet(isPresented: $showingShareSheet) {
-            if let fileURL = exportFileURL {
-                ShareSheet(activityItems: [fileURL])
+            if let url = exportURL {
+                ShareSheet(activityItems: [url])
             }
         }
         .alert(alertTitle, isPresented: $showingAlert) {
@@ -236,120 +260,35 @@ struct DataExportView: View {
         }
     }
     
-    // MARK: - Private Methods
+    /// The URL of the generated export file (temp)
+    @State private var exportURL: URL?
     
-    /// Exports journal data in the selected format
-    private func performExport() {
-        // Create timestamp for filename
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
-        let timestamp = formatter.string(from: Date())
-        let fileName = "DayLog_Export_\(timestamp).\(selectedExportFormat.fileExtension)"
-        
-        do {
-            // Get data based on format
-            let data: Data
-            switch selectedExportFormat {
-            case .json:
-                data = try exportAsJSON()
-            case .text:
-                data = try exportAsText()
-            case .csv:
-                data = try exportAsCSV()
-            }
-            
-            // Create temporary file
-            let tempDir = FileManager.default.temporaryDirectory
-            let fileURL = tempDir.appendingPathComponent(fileName)
-            
-            // Write data to file
-            try data.write(to: fileURL)
-            
-            // Store URL for sharing
-            exportFileURL = fileURL
-            
-            // Add haptic feedback
-            let successFeedback = UINotificationFeedbackGenerator()
-            successFeedback.notificationOccurred(.success)
-            
-            // Show share sheet
-            showingShareSheet = true
-        } catch {
-            // Add haptic feedback for error
-            let errorFeedback = UINotificationFeedbackGenerator()
-            errorFeedback.notificationOccurred(.error)
-            
-            showAlert(title: "Export Failed", message: "Failed to export data: \(error.localizedDescription)")
-        }
-    }
-    
-    /// Exports data as JSON format
-    private func exportAsJSON() throws -> Data {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        encoder.outputFormatting = .prettyPrinted
-        
-        let exportData = ExportData(
+    /// Generates the export file based on current selection
+    private func generateExportFile() {
+        let exportable = ExportableJournal(
             entries: journalManager.entries,
             streak: journalManager.streak,
-            exportDate: Date(),
-            appVersion: "1.0.0"
+            format: selectedExportFormat
         )
         
-        return try encoder.encode(exportData)
-    }
-    
-    /// Exports data as plain text format
-    private func exportAsText() throws -> Data {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .full
-        
-        var text = "DayLog Export\n"
-        text += "Exported on: \(dateFormatter.string(from: Date()))\n"
-        text += "Total Entries: \(journalManager.entries.count)\n"
-        text += "Current Streak: \(journalManager.streak.current) days\n"
-        text += "Best Streak: \(journalManager.streak.longest) days\n\n"
-        
-        text += "Journal Entries:\n"
-        text += String(repeating: "=", count: 50) + "\n\n"
-        
-        for entry in journalManager.entries.sorted(by: { $0.date > $1.date }) {
-            text += "Date: \(dateFormatter.string(from: entry.date))\n"
-            if let category = entry.category {
-                text += "Category: \(category)\n"
+        do {
+            let data: Data
+            switch selectedExportFormat {
+            case .json: data = try exportable.generateJSON()
+            case .text: data = try exportable.generateText()
+            case .csv: data = try exportable.generateCSV()
             }
-            if let time = entry.time {
-                text += "Time: \(time)\n"
-            }
-            text += "Content: \(entry.content)\n"
-            if entry.photoFilename != nil {
-                text += "[Photo attached]\n"
-            }
-            text += String(repeating: "-", count: 30) + "\n\n"
-        }
-        
-        return text.data(using: .utf8) ?? Data()
-    }
-    
-    /// Exports data as CSV format
-    private func exportAsCSV() throws -> Data {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateStyle = .short
-        
-        var csv = "Date,Time,Category,Content,Has Photo\n"
-        
-        for entry in journalManager.entries.sorted(by: { $0.date > $1.date }) {
-            let date = dateFormatter.string(from: entry.date)
-            let time = entry.time ?? ""
-            let category = entry.category ?? ""
-            let content = entry.content.replacingOccurrences(of: "\"", with: "\"\"")
-            let hasPhoto = entry.photoFilename != nil ? "Yes" : "No"
             
-            csv += "\"\(date)\",\"\(time)\",\"\(category)\",\"\(content)\",\"\(hasPhoto)\"\n"
+            // Clean up old temp file if exists?
+            // Actually, just generate a new one.
+            exportURL = try exportable.saveToTemp(data: data, ext: selectedExportFormat.fileExtension)
+        } catch {
+            print("Failed to generate export file: \(error)")
+            // Fallback or alert? For now silent failure means button stays loading or disabled.
         }
-        
-        return csv.data(using: .utf8) ?? Data()
     }
+    
+    // MARK: - Private Methods
     
     /// Imports data from a file URL
     private func importData(from url: URL) {
@@ -367,8 +306,16 @@ struct DataExportView: View {
             }
             
             showAlert(title: "Import Successful", message: "Successfully imported data from file.")
+            
+            // Add haptic feedback
+            let successFeedback = UINotificationFeedbackGenerator()
+            successFeedback.notificationOccurred(.success)
         } catch {
             showAlert(title: "Import Failed", message: "Failed to import data: \(error.localizedDescription)")
+            
+            // Add haptic feedback
+            let errorFeedback = UINotificationFeedbackGenerator()
+            errorFeedback.notificationOccurred(.error)
         }
     }
     
@@ -390,13 +337,13 @@ struct DataExportView: View {
         }
     }
     
-    /// Imports data from text format (basic implementation)
+    /// Imports data from text format (simple fallback)
     private func importFromText(_ data: Data) throws {
         guard let text = String(data: data, encoding: .utf8) else {
             throw ImportError.invalidData
         }
         
-        // Simple text parsing - in a real app, you'd want more robust parsing
+        // Simple text parsing
         let lines = text.components(separatedBy: .newlines)
         var currentEntry: JournalEntry?
         
@@ -427,14 +374,35 @@ struct DataExportView: View {
             throw ImportError.invalidData
         }
         
-        let lines = csv.components(separatedBy: .newlines)
+        var lines: [String] = []
+        
+        // Smart CSV parsing handling quoted newlines
+        // This is a basic state machine parser
+        var currentLine = ""
+        var inQuotes = false
+        
+        for char in csv {
+            if char == "\"" {
+                inQuotes.toggle()
+                currentLine.append(char)
+            } else if char == "\n" && !inQuotes {
+                lines.append(currentLine)
+                currentLine = ""
+            } else {
+                currentLine.append(char)
+            }
+        }
+        if !currentLine.isEmpty {
+            lines.append(currentLine)
+        }
+        
         guard lines.count > 1 else {
             throw ImportError.invalidData
         }
         
         // Skip header line
         for line in lines.dropFirst() {
-            guard !line.isEmpty else { continue }
+            guard !line.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { continue }
             
             let fields = parseCSVLine(line)
             guard fields.count >= 4 else { continue }
@@ -446,7 +414,7 @@ struct DataExportView: View {
             
             // Parse date
             let formatter = DateFormatter()
-            formatter.dateStyle = .medium
+            formatter.dateStyle = .short
             guard let date = formatter.date(from: dateString) else { continue }
             
             // Create entry
@@ -484,6 +452,93 @@ struct DataExportView: View {
         alertTitle = title
         alertMessage = message
         showingAlert = true
+    }
+}
+
+// MARK: - Transferable Implementation
+
+struct ExportableJournal {
+    let entries: [JournalEntry]
+    let streak: JournalStreak
+    let format: DataExportView.ExportFormat
+    
+    var dateString: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: Date())
+    }
+    
+    enum ExportError: Error {
+        case wrongFormat
+    }
+    
+    // Helper to create temp file for sharing
+    func saveToTemp(data: Data, ext: String) throws -> URL {
+        let fileName = "DayLog_Export_\(dateString).\(ext)"
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+        try data.write(to: url)
+        return url
+    }
+    
+    // Generator Methods
+    
+    func generateJSON() throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        encoder.outputFormatting = .prettyPrinted
+        
+        let exportData = ExportData(
+            entries: entries,
+            streak: streak,
+            exportDate: Date(),
+            appVersion: "1.0.0"
+        )
+        
+        return try encoder.encode(exportData)
+    }
+    
+    func generateText() throws -> Data {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .full
+        
+        var text = "DayLog Export\n"
+        text += "Exported on: \(dateFormatter.string(from: Date()))\n"
+        text += "Total Entries: \(entries.count)\n"
+        text += "Current Streak: \(streak.current) days\n\n"
+        
+        text += "Journal Entries:\n"
+        text += String(repeating: "=", count: 50) + "\n\n"
+        
+        for entry in entries.sorted(by: { $0.date > $1.date }) {
+            text += "Date: \(dateFormatter.string(from: entry.date))\n"
+            if let category = entry.category {
+                text += "Category: \(category)\n"
+            }
+            text += "Content: \(entry.content)\n"
+            text += String(repeating: "-", count: 30) + "\n\n"
+        }
+        
+        return text.data(using: .utf8) ?? Data()
+    }
+    
+    func generateCSV() throws -> Data {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .short
+        
+        var csv = "Date,Time,Category,Content,Has Photo\n"
+        
+        for entry in entries.sorted(by: { $0.date > $1.date }) {
+            let date = dateFormatter.string(from: entry.date)
+            let time = entry.time ?? ""
+            let category = entry.category ?? ""
+            // CSV Escape: double quotes for quotes
+            let content = entry.content.replacingOccurrences(of: "\"", with: "\"\"")
+            let hasPhoto = entry.photoFilename != nil ? "Yes" : "No"
+            
+            csv += "\"\(date)\",\"\(time)\",\"\(category)\",\"\(content)\",\"\(hasPhoto)\"\n"
+        }
+        
+        return csv.data(using: .utf8) ?? Data()
     }
 }
 
@@ -550,17 +605,59 @@ struct DocumentPicker: UIViewControllerRepresentable {
     }
 }
 
-// MARK: - Share Sheet
+// MARK: - Share Sheet Helper
 
-/// Share sheet for exporting data
+// MARK: - Share Sheet Helper
+
 struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
     
     func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
+        // Wrap URL in item source to provide metadata and correct handling
+        let items = activityItems.map { item -> Any in
+            if let url = item as? URL {
+                return ShareActivityItemSource(url: url)
+            }
+            return item
+        }
+        
+        let controller = UIActivityViewController(
+            activityItems: items,
+            applicationActivities: nil
+        )
+        return controller
     }
     
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+/// Proxy to correctly handle file URL sharing metadata
+class ShareActivityItemSource: NSObject, UIActivityItemSource {
+    let url: URL
+    
+    init(url: URL) {
+        self.url = url
+        super.init()
+    }
+    
+    func activityViewControllerPlaceholderItem(_ activityViewController: UIActivityViewController) -> Any {
+        return url
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, itemForActivityType activityType: UIActivity.ActivityType?) -> Any? {
+        return url
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, subjectForActivityType activityType: UIActivity.ActivityType?) -> String {
+        return url.lastPathComponent
+    }
+    
+    func activityViewController(_ activityViewController: UIActivityViewController, dataTypeIdentifierForActivityType activityType: UIActivity.ActivityType?) -> String {
+        // Explicitly declare type to avoid system guessing
+        if url.pathExtension == "json" { return "public.json" }
+        if url.pathExtension == "csv" { return "public.comma-separated-values-text" }
+        return "public.plain-text"
+    }
 }
 
 #Preview {
