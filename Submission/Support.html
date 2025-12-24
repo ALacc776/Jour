@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DayLog Support</title>
+    <style>
+        :root {
+            --primary-color: #333340;
+            --accent-color: #F2994A;
+            --bg-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --spacing-md: 1rem;
+            --spacing-lg: 2rem;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            border-bottom: 2px solid #F3F4F6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .faq-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .question {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .answer {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .contact-box {
+            text-align: center;
+            background: linear-gradient(135deg, #333340 0%, #202025 100%);
+            color: white;
+        }
+
+        .contact-box h2 {
+            color: white;
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .email-button {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 1rem 0;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .email-button:hover {
+            transform: translateY(-1px);
+            background-color: #E68A35;
+        }
+
+        .response-time {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>DayLog Help Center</h1>
+            <div class="subtitle">Quick daily logging, simple and fast</div>
+        </header>
+
+        <div class="section">
+            <h2>Frequently Asked Questions</h2>
+
+            <div class="faq-item">
+                <div class="question">Is my data private?</div>
+                <p class="answer">Yes! All your journal entries are stored only on your device. Nothing is sent to
+                    external servers.</p>
+            </div>
+
+            <div class="faq-item">
+                <div class="question">How do I back up my entries?</div>
+                <p class="answer">Your entries are automatically included in your iCloud backup if you have it enabled
+                    in iOS Settings. You can also use the 'Export Data' feature to create a manual backup.</p>
+            </div>
+
+            <div class="faq-item">
+                <div class="question">Can I export my journal?</div>
+                <p class="answer">Yes! Go to Settings → Export Data to save your entries as a text file. You can also
+                    use the 'Copy' features to copy entries to your clipboard.</p>
+            </div>
+
+            <div class="faq-item">
+                <div class="question">How do I set up daily reminders?</div>
+                <p class="answer">Go to Settings → Enable Notifications, then choose your preferred reminder time.</p>
+            </div>
+
+            <div class="faq-item">
+                <div class="question">What if I accidentally delete an entry?</div>
+                <p class="answer">Unfortunately, deleted entries cannot be recovered. We recommend using the Export
+                    feature regularly to back up important entries.</p>
+            </div>
+        </div>
+
+        <div class="section contact-box">
+            <h2>Still need help?</h2>
+            <p>Get in touch with us directly.</p>
+
+            <a href="mailto:support.and@proton.me?subject=DayLog%20Support" class="email-button">
+                Email Support
+            </a>
+
+            <div class="response-time">
+                Email: support.and@proton.me<br>
+                We typically respond within 48 hours
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

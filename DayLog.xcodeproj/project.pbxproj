@@ -24,18 +24,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		181B1A1B2E7A664400F148B8 /* Jour.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jour.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		181B1A2B2E7A664600F148B8 /* JourTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JourTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		181B1A352E7A664600F148B8 /* JourUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JourUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		181B1A1B2E7A664400F148B8 /* DayLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DayLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		181B1A2B2E7A664600F148B8 /* DayLogTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DayLogTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		181B1A352E7A664600F148B8 /* DayLogUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DayLogUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		1885D9732EFB091000181979 /* Exceptions for "Jour" folder in "Jour" target */ = {
+		1885D9732EFB091000181979 /* Exceptions for "Jour" folder in "DayLog" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 181B1A1A2E7A664400F148B8 /* Jour */;
+			target = 181B1A1A2E7A664400F148B8 /* DayLog */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -43,7 +43,7 @@
 		181B1A1D2E7A664400F148B8 /* Jour */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				1885D9732EFB091000181979 /* Exceptions for "Jour" folder in "Jour" target */,
+				1885D9732EFB091000181979 /* Exceptions for "Jour" folder in "DayLog" target */,
 			);
 			path = Jour;
 			sourceTree = "<group>";
@@ -98,9 +98,9 @@
 		181B1A1C2E7A664400F148B8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				181B1A1B2E7A664400F148B8 /* Jour.app */,
-				181B1A2B2E7A664600F148B8 /* JourTests.xctest */,
-				181B1A352E7A664600F148B8 /* JourUITests.xctest */,
+				181B1A1B2E7A664400F148B8 /* DayLog.app */,
+				181B1A2B2E7A664600F148B8 /* DayLogTests.xctest */,
+				181B1A352E7A664600F148B8 /* DayLogUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -108,9 +108,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		181B1A1A2E7A664400F148B8 /* Jour */ = {
+		181B1A1A2E7A664400F148B8 /* DayLog */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 181B1A3F2E7A664600F148B8 /* Build configuration list for PBXNativeTarget "Jour" */;
+			buildConfigurationList = 181B1A3F2E7A664600F148B8 /* Build configuration list for PBXNativeTarget "DayLog" */;
 			buildPhases = (
 				181B1A172E7A664400F148B8 /* Sources */,
 				181B1A182E7A664400F148B8 /* Frameworks */,
@@ -123,16 +123,16 @@
 			fileSystemSynchronizedGroups = (
 				181B1A1D2E7A664400F148B8 /* Jour */,
 			);
-			name = Jour;
+			name = DayLog;
 			packageProductDependencies = (
 			);
 			productName = Jour;
-			productReference = 181B1A1B2E7A664400F148B8 /* Jour.app */;
+			productReference = 181B1A1B2E7A664400F148B8 /* DayLog.app */;
 			productType = "com.apple.product-type.application";
 		};
-		181B1A2A2E7A664600F148B8 /* JourTests */ = {
+		181B1A2A2E7A664600F148B8 /* DayLogTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 181B1A422E7A664600F148B8 /* Build configuration list for PBXNativeTarget "JourTests" */;
+			buildConfigurationList = 181B1A422E7A664600F148B8 /* Build configuration list for PBXNativeTarget "DayLogTests" */;
 			buildPhases = (
 				181B1A272E7A664600F148B8 /* Sources */,
 				181B1A282E7A664600F148B8 /* Frameworks */,
@@ -146,16 +146,16 @@
 			fileSystemSynchronizedGroups = (
 				181B1A2E2E7A664600F148B8 /* JourTests */,
 			);
-			name = JourTests;
+			name = DayLogTests;
 			packageProductDependencies = (
 			);
 			productName = JourTests;
-			productReference = 181B1A2B2E7A664600F148B8 /* JourTests.xctest */;
+			productReference = 181B1A2B2E7A664600F148B8 /* DayLogTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		181B1A342E7A664600F148B8 /* JourUITests */ = {
+		181B1A342E7A664600F148B8 /* DayLogUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 181B1A452E7A664600F148B8 /* Build configuration list for PBXNativeTarget "JourUITests" */;
+			buildConfigurationList = 181B1A452E7A664600F148B8 /* Build configuration list for PBXNativeTarget "DayLogUITests" */;
 			buildPhases = (
 				181B1A312E7A664600F148B8 /* Sources */,
 				181B1A322E7A664600F148B8 /* Frameworks */,
@@ -169,11 +169,11 @@
 			fileSystemSynchronizedGroups = (
 				181B1A382E7A664600F148B8 /* JourUITests */,
 			);
-			name = JourUITests;
+			name = DayLogUITests;
 			packageProductDependencies = (
 			);
 			productName = JourUITests;
-			productReference = 181B1A352E7A664600F148B8 /* JourUITests.xctest */;
+			productReference = 181B1A352E7A664600F148B8 /* DayLogUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -199,7 +199,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 181B1A162E7A664400F148B8 /* Build configuration list for PBXProject "Jour" */;
+			buildConfigurationList = 181B1A162E7A664400F148B8 /* Build configuration list for PBXProject "DayLog" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -213,9 +213,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				181B1A1A2E7A664400F148B8 /* Jour */,
-				181B1A2A2E7A664600F148B8 /* JourTests */,
-				181B1A342E7A664600F148B8 /* JourUITests */,
+				181B1A1A2E7A664400F148B8 /* DayLog */,
+				181B1A2A2E7A664600F148B8 /* DayLogTests */,
+				181B1A342E7A664600F148B8 /* DayLogUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -271,12 +271,12 @@
 /* Begin PBXTargetDependency section */
 		181B1A2D2E7A664600F148B8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 181B1A1A2E7A664400F148B8 /* Jour */;
+			target = 181B1A1A2E7A664400F148B8 /* DayLog */;
 			targetProxy = 181B1A2C2E7A664600F148B8 /* PBXContainerItemProxy */;
 		};
 		181B1A372E7A664600F148B8 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 181B1A1A2E7A664400F148B8 /* Jour */;
+			target = 181B1A1A2E7A664400F148B8 /* DayLog */;
 			targetProxy = 181B1A362E7A664600F148B8 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -488,7 +488,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Jour.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Jour";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DayLog.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DayLog";
 			};
 			name = Debug;
 		};
@@ -507,7 +507,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Jour.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Jour";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DayLog.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DayLog";
 			};
 			name = Release;
 		};
@@ -548,7 +548,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		181B1A162E7A664400F148B8 /* Build configuration list for PBXProject "Jour" */ = {
+		181B1A162E7A664400F148B8 /* Build configuration list for PBXProject "DayLog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				181B1A3D2E7A664600F148B8 /* Debug */,
@@ -557,7 +557,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		181B1A3F2E7A664600F148B8 /* Build configuration list for PBXNativeTarget "Jour" */ = {
+		181B1A3F2E7A664600F148B8 /* Build configuration list for PBXNativeTarget "DayLog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				181B1A402E7A664600F148B8 /* Debug */,
@@ -566,7 +566,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		181B1A422E7A664600F148B8 /* Build configuration list for PBXNativeTarget "JourTests" */ = {
+		181B1A422E7A664600F148B8 /* Build configuration list for PBXNativeTarget "DayLogTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				181B1A432E7A664600F148B8 /* Debug */,
@@ -575,7 +575,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		181B1A452E7A664600F148B8 /* Build configuration list for PBXNativeTarget "JourUITests" */ = {
+		181B1A452E7A664600F148B8 /* Build configuration list for PBXNativeTarget "DayLogUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				181B1A462E7A664600F148B8 /* Debug */,
