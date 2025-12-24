@@ -29,9 +29,22 @@
 		181B1A352E7A664600F148B8 /* JourUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JourUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1885D9732EFB091000181979 /* Exceptions for "Jour" folder in "Jour" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 181B1A1A2E7A664400F148B8 /* Jour */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		181B1A1D2E7A664400F148B8 /* Jour */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1885D9732EFB091000181979 /* Exceptions for "Jour" folder in "Jour" target */,
+			);
 			path = Jour;
 			sourceTree = "<group>";
 		};
@@ -398,7 +411,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Jour/Preview Content\"";
 				DEVELOPMENT_TEAM = D9NN798486;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Jour/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DayLog;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Snap photos for your daily journal";
@@ -433,7 +447,8 @@
 				DEVELOPMENT_ASSET_PATHS = "\"Jour/Preview Content\"";
 				DEVELOPMENT_TEAM = D9NN798486;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Jour/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = DayLog;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Snap photos for your daily journal";
