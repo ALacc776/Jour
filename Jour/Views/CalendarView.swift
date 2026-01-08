@@ -15,6 +15,9 @@ struct CalendarView: View {
     /// Reference to the journal manager for accessing entries
     @ObservedObject var journalManager: JournalManager
     
+    /// Reference to the theme manager
+    @EnvironmentObject var themeManager: ThemeManager
+    
     /// Currently selected date in the calendar
     @State private var selectedDate = Date()
     
@@ -33,7 +36,6 @@ struct CalendarView: View {
                 VStack(spacing: AppConstants.Spacing.lg) {
                     DatePicker("Select Date", selection: $selectedDate, displayedComponents: .date)
                         .datePickerStyle(GraphicalDatePickerStyle())
-                        .colorScheme(.light)
                         .padding(AppConstants.Spacing.lg)
                         .background(
                             RoundedRectangle(cornerRadius: AppConstants.CornerRadius.lg)
@@ -143,17 +145,17 @@ struct CalendarView: View {
                         }
                     }
                 }
-                .cleanBackground()
-                
-                Spacer()
             }
+            .background(AppConstants.Colors.primaryBackground)
             .navigationTitle("Calendar")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showingEntryModal) {
                 NewEntryView(journalManager: journalManager, selectedDate: selectedDate)
+                    .environmentObject(themeManager)
             }
             .sheet(item: $editingEntry) { entry in
                 EditEntryView(journalManager: journalManager, entry: entry)
+                    .environmentObject(themeManager)
             }
             .alert("Copied to Clipboard", isPresented: $showingCopyAlert) {
                 Button("OK") { }

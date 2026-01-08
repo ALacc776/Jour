@@ -153,7 +153,7 @@ The app includes a comprehensive privacy policy that covers:
 ## Support
 
 For support and questions:
-- Email: support@daylog.app (placeholder)
+- Email: support.and@proton.me
 - In-app support through Menu
 
 ## Development
@@ -198,7 +198,7 @@ This project is proprietary software. All rights reserved.
 
 For questions about this app or its development:
 - Developer: andapple
-- Email: support@daylog.app (placeholder)
+- Email: support.and@proton.me
 
 ---
 

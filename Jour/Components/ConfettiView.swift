@@ -3,25 +3,43 @@ import SwiftUI
 
 struct ConfettiModifier: ViewModifier {
     @Binding var counter: Int
-    @State private var circleStart: Bool = false
-    @State private var circleEnd: Bool = false
+    @State private var isAnimating: Bool = false
+    @State private var lastCounter: Int = 0
     
     func body(content: Content) -> some View {
         ZStack {
             content
             
-            if counter > 0 {
+            // Only show confetti during active animation
+            if isAnimating {
                 ForEach(0..<20, id: \.self) { index in
-                    ConfettiParticle(index: index, counter: counter)
+                    ConfettiParticle(index: index, triggerId: counter)
                 }
             }
+        }
+        .onChange(of: counter) { newValue in
+            // Only trigger if counter actually increased (new save event)
+            if newValue > lastCounter {
+                lastCounter = newValue
+                triggerAnimation()
+            }
+        }
+    }
+    
+    private func triggerAnimation() {
+        // Start animation
+        isAnimating = true
+        
+        // Stop animation after 2 seconds (animation duration)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            isAnimating = false
         }
     }
 }
 
 struct ConfettiParticle: View {
     let index: Int
-    let counter: Int
+    let triggerId: Int
     @State private var location: CGPoint = .zero
     @State private var opacity: Double = 0
     
@@ -43,19 +61,16 @@ struct ConfettiParticle: View {
             .position(location)
             .opacity(opacity)
             .onAppear {
+                // Reset and animate immediately when particle appears
                 withAnimation(.none) {
                     reset()
                 }
                 animate()
             }
-            .onChange(of: counter) { _ in
-                reset()
-                animate()
-            }
     }
     
     func reset() {
-        // Start from center-ish (or click location if we tracked it, but center is fine for general reward)
+        // Start from center of screen
         let screenWidth = UIScreen.main.bounds.width
         let startX = screenWidth / 2
         let startY = UIScreen.main.bounds.height / 2

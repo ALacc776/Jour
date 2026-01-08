@@ -15,6 +15,9 @@ struct TodayView: View {
     /// Reference to the journal manager
     @ObservedObject var journalManager: JournalManager
     
+    /// Reference to the theme manager
+    @EnvironmentObject var themeManager: ThemeManager
+    
     // MARK: - State
     
     /// Controls whether to show settings
@@ -301,9 +304,11 @@ struct TodayView: View {
             .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $editingEntry) { entry in
                 EditEntryView(journalManager: journalManager, entry: entry)
+                    .environmentObject(themeManager)
             }
             .sheet(isPresented: $showingSearch) {
                 SearchView(journalManager: journalManager)
+                    .environmentObject(themeManager)
             }
             .sheet(isPresented: $showingCamera) {
                 if isCameraAvailable() {
@@ -333,9 +338,11 @@ struct TodayView: View {
             }
             .sheet(isPresented: $showingSettings) {
                 MenuView(journalManager: journalManager)
+                    .environmentObject(themeManager)
             }
             .sheet(isPresented: $showingStats) {
                 StatsView(journalManager: journalManager)
+                    .environmentObject(themeManager)
             }
         }
         .confetti(counter: $confettiCounter)
@@ -472,5 +479,6 @@ struct TodayView: View {
 
 #Preview {
     TodayView(journalManager: JournalManager())
+        .environmentObject(ThemeManager())
 }
 

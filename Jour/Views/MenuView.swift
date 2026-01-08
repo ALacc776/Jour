@@ -18,6 +18,9 @@ struct MenuView: View {
     /// Reference to the notification manager
     @StateObject private var notificationManager = NotificationManager()
     
+    /// Reference to the theme manager
+    @EnvironmentObject var themeManager: ThemeManager
+    
     // MARK: - State
     
     /// Controls various sheet presentations
@@ -67,6 +70,32 @@ struct MenuView: View {
                     }
                 }
                 
+                // MARK: - Appearance Section
+                Section {
+                    Picker("Theme", selection: $themeManager.currentTheme) {
+                        ForEach(AppTheme.allCases) { theme in
+                            Label {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(theme.rawValue)
+                                        .foregroundColor(AppConstants.Colors.primaryText)
+                                    Text(theme.description)
+                                        .font(.caption)
+                                        .foregroundColor(AppConstants.Colors.secondaryText)
+                                }
+                            } icon: {
+                                Image(systemName: theme.icon)
+                                    .foregroundColor(AppConstants.Colors.accentButton)
+                            }
+                            .tag(theme)
+                        }
+                    }
+                    .pickerStyle(.navigationLink)
+                } header: {
+                    Text("Appearance")
+                } footer: {
+                    Text("Choose how DayLog looks. System matches your device settings.")
+                }
+                
                 // MARK: - App Info Section
                 Section {
                     // Version
@@ -74,7 +103,7 @@ struct MenuView: View {
                         Label("Version", systemImage: "app.badge")
                             .foregroundColor(AppConstants.Colors.primaryText)
                         Spacer()
-                        Text("1.0.0")
+                        Text("1.1.0")
                             .foregroundColor(AppConstants.Colors.secondaryText)
                     }
                 } header: {
@@ -167,6 +196,8 @@ struct MenuView: View {
                         .foregroundColor(AppConstants.Colors.errorColor)
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(AppConstants.Colors.primaryBackground)
             .navigationTitle("Menu")
             .navigationBarTitleDisplayMode(.large)
         }
@@ -290,5 +321,6 @@ struct MenuView: View {
 
 #Preview {
     MenuView(journalManager: JournalManager())
+        .environmentObject(ThemeManager())
 }
 
