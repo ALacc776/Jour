@@ -22,6 +22,13 @@ class JournalManager: ObservableObject {
     /// Loading state for initial data fetch
     @Published var isLoading = true
     
+    /// Whether to copy entries to clipboard with newest first (default: true)
+    @Published var copyNewestFirst: Bool = true {
+        didSet {
+            userDefaults.set(copyNewestFirst, forKey: AppConstants.UserDefaultsKeys.copyNewestFirst)
+        }
+    }
+    
     // MARK: - Private Properties
     
     /// UserDefaults instance for data persistence
@@ -44,6 +51,16 @@ class JournalManager: ObservableObject {
     
     /// Initializes the JournalManager and loads existing data
     init() {
+        // Load copy order preference (default to newest first)
+        if userDefaults.object(forKey: AppConstants.UserDefaultsKeys.copyNewestFirst) == nil {
+            // First launch - set default to true
+            self.copyNewestFirst = true
+            userDefaults.set(true, forKey: AppConstants.UserDefaultsKeys.copyNewestFirst)
+        } else {
+            // Load saved preference
+            self.copyNewestFirst = userDefaults.bool(forKey: AppConstants.UserDefaultsKeys.copyNewestFirst)
+        }
+        
         // Load data asynchronously to prevent blocking app launch
         persistenceQueue.async { [weak self] in
             guard let self = self else { return }
@@ -185,7 +202,8 @@ class JournalManager: ObservableObject {
             calendar.startOfDay(for: entry.date)
         }
         
-        let sortedDates = grouped.keys.sorted()
+        // Sort dates based on user preference
+        let sortedDates = copyNewestFirst ? grouped.keys.sorted(by: >) : grouped.keys.sorted()
         var output = ""
         
         for date in sortedDates {
@@ -195,7 +213,8 @@ class JournalManager: ObservableObject {
             
             output += "\(dateString):\n"
             
-            if let dayEntries = grouped[date]?.sorted(by: { $0.date < $1.date }) {
+            // Sort entries within each day based on user preference
+            if let dayEntries = grouped[date]?.sorted(by: { copyNewestFirst ? $0.date > $1.date : $0.date < $1.date }) {
                 for entry in dayEntries {
                     let text = entry.content.trimmingCharacters(in: .whitespacesAndNewlines)
                     if text.isEmpty, entry.photoFilename != nil {
@@ -232,7 +251,11 @@ class JournalManager: ObservableObject {
         
         // Check if we have an entry today or yesterday
         let hasEntryToday = entryDates.contains(today)
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: today)!
+        guard let yesterday = calendar.date(byAdding: .day, value: -1, to: today) else {
+            streak.current = 0
+            saveStreak()
+            return
+        }
         let hasEntryYesterday = entryDates.contains(yesterday)
         
         if hasEntryToday {
@@ -242,7 +265,10 @@ class JournalManager: ObservableObject {
             
             while entryDates.contains(checkDate) {
                 currentStreak += 1
-                checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+                guard let previousDate = calendar.date(byAdding: .day, value: -1, to: checkDate) else {
+                    break
+                }
+                checkDate = previousDate
             }
             
             streak.current = currentStreak
@@ -256,7 +282,10 @@ class JournalManager: ObservableObject {
             
             while entryDates.contains(checkDate) {
                 currentStreak += 1
-                checkDate = calendar.date(byAdding: .day, value: -1, to: checkDate)!
+                guard let previousDate = calendar.date(byAdding: .day, value: -1, to: checkDate) else {
+                    break
+                }
+                checkDate = previousDate
             }
             streak.current = currentStreak
         } else {

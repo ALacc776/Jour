@@ -74,9 +74,13 @@ class PrivacyManager: ObservableObject {
     func encryptText(_ text: String) -> Data? {
         guard isEncryptionEnabled else { return text.data(using: .utf8) }
         
+        guard let data = text.data(using: .utf8) else {
+            print("Failed to convert text to UTF-8 data")
+            return nil
+        }
+        
         do {
             let key = try getOrCreateEncryptionKey()
-            let data = text.data(using: .utf8)!
             let sealedBox = try AES.GCM.seal(data, using: key)
             return sealedBox.combined
         } catch {

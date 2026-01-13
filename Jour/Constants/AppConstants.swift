@@ -149,6 +149,7 @@ enum AppConstants {
     enum UserDefaultsKeys {
         static let journalEntries = "journal_entries"
         static let journalStreak = "journal_streak"
+        static let copyNewestFirst = "copy_newest_first"
     }
     
     // MARK: - Date Formatting

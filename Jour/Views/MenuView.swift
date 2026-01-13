@@ -160,10 +160,17 @@ struct MenuView: View {
                         Label("Copy Custom Range...", systemImage: "calendar.badge.ellipsis")
                             .foregroundColor(AppConstants.Colors.primaryText)
                     }
+                    
+                    // Copy order toggle
+                    Toggle(isOn: $journalManager.copyNewestFirst) {
+                        Label("Newest First", systemImage: "arrow.down")
+                            .foregroundColor(AppConstants.Colors.primaryText)
+                    }
+                    .tint(AppConstants.Colors.accentButton)
                 } header: {
                     Text("Export to Clipboard")
                 } footer: {
-                    Text("Copy entries in bullet-list format to paste in Google Drive or other apps")
+                    Text("Copy entries in bullet-list format. Toggle 'Newest First' to change the order.")
                 }
                 
                 // MARK: - Data Management Section

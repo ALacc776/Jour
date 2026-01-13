@@ -56,7 +56,7 @@ struct ConfettiParticle: View {
     
     var body: some View {
         Circle()
-            .fill(colors.randomElement()!)
+            .fill(colors.randomElement() ?? .orange)
             .frame(width: 8, height: 8)
             .position(location)
             .opacity(opacity)
